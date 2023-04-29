@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "tallydb": {
+      "commandName": "Project",
+      "commandLineArgs": "--port=4053"
+    }
+  }
+}

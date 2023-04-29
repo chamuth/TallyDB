@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TallyDB", "TallyDB.csproj", "{B604B502-DBBF-43EE-AF65-E93420171A00}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B604B502-DBBF-43EE-AF65-E93420171A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B604B502-DBBF-43EE-AF65-E93420171A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B604B502-DBBF-43EE-AF65-E93420171A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B604B502-DBBF-43EE-AF65-E93420171A00}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C88ED89-990C-4F6A-BF65-C88DDF56DEDE}
+	EndGlobalSection
+EndGlobal
