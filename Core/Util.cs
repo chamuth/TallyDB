@@ -16,5 +16,15 @@ namespace TallyDB.Core
       char[] invalidChars = Path.GetInvalidFileNameChars();
       return string.Join("_", name.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
     }
+
+    /// <summary>
+    /// Appends extension name
+    /// </summary>
+    /// <param name="filename">Original filename</param>
+    /// <returns>Filename with new extension</returns>
+    public static string AppendExtension(this string filename)
+    {
+      return string.Format("{0}.{1}", filename, Constants.TallyExtension);
+    }
   }
 }

@@ -7,20 +7,12 @@ namespace TallyDB.Core
   /// </summary>
   internal class Database
   {
-    string _name;
+    public string Name { get; set; }
     List<Slice> _slices = new List<Slice>();
 
     public Database(string name)
     {
-      _name = name;
-    }
-
-
-    public static Slice[] GetSlices(string databaseName)
-    {
-      var returner = new List<Slice>();
-
-      return returner.ToArray();
+      Name = name;
     }
 
     /// <summary>
@@ -31,7 +23,7 @@ namespace TallyDB.Core
     {
       try
       {
-        Storage.CreateDirectory(_name);
+        Storage.CreateDirectory(Name);
       }
       catch (Exception)
       {
@@ -45,7 +37,7 @@ namespace TallyDB.Core
     /// </summary>
     public void Load()
     {
-      var files = Storage.GetFilesInDirectory(_name);
+      var files = Storage.GetFilesInDirectory(Name);
       
       foreach(var file in files)
       {
