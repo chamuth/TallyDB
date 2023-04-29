@@ -15,7 +15,8 @@ namespace TallyDB.Core
       }
     }
 
-    static string Join(string sub)
+    
+    public static string Join(string sub)
     {
       return Path.Combine(RootDirectory, sub)
         .SanitizeFilename();
@@ -28,7 +29,7 @@ namespace TallyDB.Core
 
     public static void CreateFile(string name)
     {
-      File.Create(Join(name));
+      File.Create(Join(name).AppendExtension());
     }
 
     public static void GetDirectoriesInDirectory()
