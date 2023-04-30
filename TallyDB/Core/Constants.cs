@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TallyDB.Core
 {
-  internal static class Constants
+  public static class Constants
   {
     public const string TallyExtension = "tally";
   }

@@ -1,7 +1,7 @@
 ﻿
 namespace TallyDB.Core
 {
-  internal enum DataType
+  public enum DataType
   {
     INT = 1,
     TEXT = 2,

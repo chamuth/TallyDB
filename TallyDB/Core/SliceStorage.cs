@@ -2,7 +2,7 @@
 
 namespace TallyDB.Core
 {
-  internal class SliceStorage
+  public class SliceStorage
   {
     SliceDefinition _definition;
     BinaryWriter _writer;
@@ -32,7 +32,7 @@ namespace TallyDB.Core
       TextConverter txtConverter = new TextConverter();
 
       // Name of the slice 
-      byte[] name = txtConverter.Convert(_definition.Name);
+      byte[] name = txtConverter.Encode(_definition.Name);
 
       // Number of axes
       byte[] axisCount = { (byte)_definition.Axes.Length };
@@ -42,7 +42,7 @@ namespace TallyDB.Core
 
       foreach (Axis axis in _definition.Axes)
       {
-        byte[] axisName = txtConverter.Convert(axis.Name);
+        byte[] axisName = txtConverter.Encode(axis.Name);
         byte dataType = (byte)axis.Type;
         byte function = (byte)axis.Function;
         byte axisProps = (byte)((dataType << 4) | function);

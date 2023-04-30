@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace TallyDB.Server
 {
-    internal class TallyServer
+    public class TallyServer
     {
         int port = 4053;
         IPAddress localAddr = IPAddress.Parse("127.0.0.1");

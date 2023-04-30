@@ -1,7 +1,8 @@
 ﻿namespace TallyDB.Core.ByteConverters
 {
-  internal interface IByteConverter<T>
+  public interface IByteConverter<T>
   {
-    public byte[] Convert(T value);
+    public byte[] Encode(T value);
+    public T Decode(byte[] bytes);
   }
 }

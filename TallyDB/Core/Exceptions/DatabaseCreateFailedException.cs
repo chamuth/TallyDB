@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TallyDB.Core.Exceptions
 {
-  internal class DatabaseCreateFailedException: Exception
+  public class DatabaseCreateFailedException: Exception
   {
 
   }

@@ -1,7 +1,7 @@
 ﻿
 namespace TallyDB.Core
 {
-  internal class SliceDefinition
+  public class SliceDefinition
   {
     public string Name { get; set; }
     public Axis[] Axes { get; set; }

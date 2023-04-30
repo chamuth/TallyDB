@@ -1,6 +1,6 @@
 ﻿namespace TallyDB.Core
 {
-  internal class SliceCreator
+  public class SliceCreator
   {
     Database _database;
 

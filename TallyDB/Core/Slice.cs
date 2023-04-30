@@ -2,7 +2,7 @@
 
 namespace TallyDB.Core
 {
-  internal class Slice
+  public class Slice
   {
     string _name;
     FileStream _stream;

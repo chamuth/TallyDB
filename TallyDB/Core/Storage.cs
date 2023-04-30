@@ -3,7 +3,7 @@ using static System.Environment;
 
 namespace TallyDB.Core
 {
-  internal static class Storage
+  public static class Storage
   {
     public static string RootDirectory = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), "TallyDB\\Source\\");
 

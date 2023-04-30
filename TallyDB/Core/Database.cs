@@ -5,7 +5,7 @@ namespace TallyDB.Core
   /// <summary>
   /// Represents a Database instance
   /// </summary>
-  internal class Database
+  public class Database
   {
     public string Name { get; set; }
     List<Slice> _slices = new List<Slice>();
