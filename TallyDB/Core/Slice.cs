@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using TallyDB.Core.ByteConverters;
 
 namespace TallyDB.Core
 {
@@ -9,6 +10,8 @@ namespace TallyDB.Core
     BinaryReader _reader;
     BinaryWriter _writer;
 
+    SliceDefinition? _definition;
+
     ~Slice()
     {
       _reader.Close();
@@ -16,8 +19,10 @@ namespace TallyDB.Core
       _stream.Dispose();
     }
 
-    public Slice(string filename)
+    public Slice(string filename, SliceDefinition? definition)
     {
+      _definition = definition;
+
       _name = Path.GetFileNameWithoutExtension(filename);
 
       // Initialize IO readers and writers
@@ -26,9 +31,25 @@ namespace TallyDB.Core
       _writer = new BinaryWriter(_stream, Encoding.UTF8);
     }
 
-    public BinaryWriter GetWriter()
+    /// <summary>
+    /// Stores and updates slice definitions into slice file
+    /// </summary>
+    public void UpdateSliceDefinition()
     {
-      return _writer;
+      if (_definition == null)
+      {
+        return;
+      }
+
+      var converter = new SliceHeaderConverter();
+      byte[] buffer = converter.Encode(_definition);
+      _writer.Write(buffer, 0, buffer.Length);
+      _writer.Flush();
+    }
+
+    public void Report(SliceRecord record)
+    {
+
     }
   }
 }

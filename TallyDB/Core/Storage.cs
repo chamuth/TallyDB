@@ -15,7 +15,6 @@ namespace TallyDB.Core
       }
     }
 
-    
     public static string Join(string sub)
     {
       return Path.Combine(RootDirectory, sub);

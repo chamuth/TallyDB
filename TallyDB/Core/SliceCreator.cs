@@ -15,7 +15,7 @@
     /// <param name="definition"></param>
     public Slice Create(SliceDefinition definition)
     {
-      // Create file for 
+      // Create file for slice
       var filename = Storage.Join(string.Format("{0}\\{1}", _database.Name, definition.Name));
       if (!File.Exists(filename))
       {
@@ -23,12 +23,9 @@
       }
 
       // Return created storage
-      var slice = new Slice(filename);
+      var slice = new Slice(filename, definition);
       // Store definition
-      var sliceStorage = new SliceStorage(definition, slice.GetWriter());
-      sliceStorage.UpdateSliceDefinitions();
-
-      byte[] sad = sliceStorage.CreateHeaderBufferForDefinition();
+      slice.UpdateSliceDefinition();
 
       return slice;
     }
