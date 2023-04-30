@@ -1,28 +1,18 @@
-﻿using System.CommandLine;
-using TallyDB.Server;
+﻿using TallyDB.Core;
 
 namespace TallyDB
 {
-    internal class Program
+  internal class Program
   {
-    static async Task<int> Main(string[] args)
+    static void Main(string[] args)
     {
-      Console.WriteLine(Path.GetFileName("C:\\Options\\Textr.tst"));
+      var db = new Database("test");
+      db.Create();
 
-      var portOptions = new Option<int>(
-          name: "--port",
-          description: "Port to start TallyDB");
-
-      var rootCommand = new RootCommand("TallyDB");
-      rootCommand.AddOption(portOptions);
-
-      rootCommand.SetHandler((port) =>
-      {
-        TallyServer tally = new TallyServer();
-        tally.StartServer();
-      }, portOptions);
-
-      return await rootCommand.InvokeAsync(args);
+      var creator = new SliceCreator(db);
+      var slice = creator.Create(new SliceDefinition(
+        "response", new Axis[] { new Axis("time", DataType.FLOAT, AggregateFunction.AVG) }, 1 / 60
+      ));
     }
   }
 }

@@ -15,9 +15,22 @@
     /// <param name="definition"></param>
     public Slice Create(SliceDefinition definition)
     {
+      // Create file for 
       var filename = Storage.Join(string.Format("{0}\\{1}", _database.Name, definition.Name));
-      Storage.CreateFile(filename);
-      return new Slice(filename);
+      if (!File.Exists(filename))
+      {
+        Storage.CreateFile(filename);
+      }
+
+      // Return created storage
+      var slice = new Slice(filename);
+      // Store definition
+      var sliceStorage = new SliceStorage(definition, slice.GetWriter());
+      sliceStorage.UpdateSliceDefinitions();
+
+      byte[] sad = sliceStorage.CreateHeaderBufferForDefinition();
+
+      return slice;
     }
   }
 }

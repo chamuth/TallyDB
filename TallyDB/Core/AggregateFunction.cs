@@ -3,8 +3,8 @@ namespace TallyDB.Core
 {
   internal enum AggregateFunction
   {
-    KEY,
-    SUM,
-    AVG
+    KEY = 1,
+    SUM = 2,
+    AVG = 3
   }
 }

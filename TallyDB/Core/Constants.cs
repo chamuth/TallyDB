@@ -8,6 +8,6 @@ namespace TallyDB.Core
 {
   internal static class Constants
   {
-    public const string TallyExtension = ".tally";
+    public const string TallyExtension = "tally";
   }
 }

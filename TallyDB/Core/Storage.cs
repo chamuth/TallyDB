@@ -18,18 +18,20 @@ namespace TallyDB.Core
     
     public static string Join(string sub)
     {
-      return Path.Combine(RootDirectory, sub)
-        .SanitizeFilename();
+      return Path.Combine(RootDirectory, sub);
     }
 
     public static void CreateDirectory(string name)
     {
-      Directory.CreateDirectory(Join(name));
+      var directory = Join(name);
+      Directory.CreateDirectory(directory);
+      Console.WriteLine("Created Directory: {0}", directory);
     }
 
     public static void CreateFile(string name)
     {
-      File.Create(Join(name).AppendExtension());
+      var fs = File.Create(Join(name).AppendExtension());
+      fs.Close();
     }
 
     public static void GetDirectoriesInDirectory()
