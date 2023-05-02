@@ -52,7 +52,7 @@
 
     public int GetHeaderLength(SliceDefinition definition)
     {
-      return 41 + 33 * _definition.Axes.Length;
+      return 41 + 33 * definition.Axes.Length;
     }
   }
 }

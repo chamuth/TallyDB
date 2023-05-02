@@ -41,7 +41,7 @@ namespace TallyDB.Core
       
       foreach(var file in files)
       {
-        _slices.Add(new Slice(file));
+        _slices.Add(new Slice(file, null));
       }
     }
 

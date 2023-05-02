@@ -27,6 +27,16 @@
           var converter = new TextConverter();
           values.AddRange(converter.Encode(datum.StringValue));
         }
+        else if (datum.Type == DataType.FLOAT)
+        {
+          var converter = new FloatConverter();
+          values.AddRange(converter.Encode(float.Parse(datum.StringValue)));
+        }
+        else if (datum.Type == DataType.INT)
+        {
+          var converter = new IntConverter();
+          values.AddRange(converter.Encode(int.Parse(datum.StringValue)));
+        }
       }
 
       return dateTime;
