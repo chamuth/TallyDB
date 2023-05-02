@@ -1,7 +1,7 @@
 ﻿
 namespace TallyDB.Core
 {
-  internal class Axis
+  public class Axis
   {
     public string Name;
     public DataType Type;

@@ -4,7 +4,7 @@ namespace TallyDB.Core
   /// <summary>
   /// Utility methods and extensions
   /// </summary>
-  internal static class Util
+  public static class Util
   {
     /// <summary>
     /// Sanitize filenames, folder names from invalid characters
