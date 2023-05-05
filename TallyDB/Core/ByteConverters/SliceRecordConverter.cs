@@ -41,5 +41,16 @@
 
       return dateTime;
     }
+
+    public int GetFixedLength()
+    {
+      if (_definition == null)
+      {
+        return 0;
+      }
+
+      // TODO 
+      return 0;
+    }
   }
 }

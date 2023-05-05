@@ -1,4 +1,7 @@
-﻿namespace TallyDB.Core.ByteConverters
+﻿using System.ComponentModel;
+using TallyDB.Core.ByteConverters.Util;
+
+namespace TallyDB.Core.ByteConverters
 {
   /// <summary>
   /// Contains Slice Storage helper functions taking Slice Definitions
@@ -12,7 +15,28 @@
     /// <returns>SliceDefinition</returns>
     public SliceDefinition Decode(byte[] bytes)
     {
-      throw new NotImplementedException();
+      var skip = 0;
+      // load slice name
+      var textConverter = new TextConverter();
+      var name = bytes.DecodeByteSlice(ref skip, textConverter);
+      // load axis count
+      int axisCount = bytes[++skip - 1];
+
+      // Load each axis
+      List<Axis> axes = new List<Axis>();
+      for (var i = 0; i < axisCount; i++)
+      {
+        var axisName = bytes.DecodeByteSlice(ref skip, textConverter);
+        var axisProps = bytes[++skip - 1];
+
+        DataType dataType = (DataType)(axisProps >> 4);
+        AggregateFunction function = (AggregateFunction)(axisProps & 0x0F);
+        axes.Add(new Axis(axisName, dataType, function));
+      }
+
+      double frequency = BitConverter.ToDouble(bytes.Skip(skip).Take(8).ToArray());
+
+      return new SliceDefinition(name, axes.ToArray(), frequency);
     }
 
     /// <summary>
@@ -47,12 +71,13 @@
       // Frequency
       byte[] frequency = BitConverter.GetBytes(definition.Frequency);
 
-      return name.Concat(axisCount).Concat(axes).Concat(frequency).ToArray();
+      // Final byte buffer
+      return (new byte[][] { name, axisCount, axes, frequency }).ConcatTogether();
     }
 
-    public int GetHeaderLength(SliceDefinition definition)
+    public int GetFixedLength()
     {
-      return 41 + 33 * definition.Axes.Length;
+      return 0;
     }
   }
 }

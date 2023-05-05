@@ -55,6 +55,11 @@ namespace TallyDB.Core
       _writer.Flush();
     }
 
+    public void LoadSliceDefinition()
+    {
+      
+    }
+
     public void Report(SliceRecord record)
     {
       if (converter == null)

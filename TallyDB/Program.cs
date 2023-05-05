@@ -14,7 +14,10 @@ namespace TallyDB
         "response", new Axis[] { new Axis("time", DataType.FLOAT, AggregateFunction.AVG) }, 1 / 60
       ));
 
-      //slice.Report();
+      slice.Report(new SliceRecord(new SliceRecordData[]
+      {
+        new SliceRecordData(DataType.INT, "23")
+      }));
     }
   }
 }

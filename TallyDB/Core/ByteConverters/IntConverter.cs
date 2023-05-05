@@ -1,6 +1,6 @@
 ﻿namespace TallyDB.Core.ByteConverters
 {
-  public class IntConverter : IByteConverter<int>, IFixedLengthConverter
+  public class IntConverter : IByteConverter<int>
   {
     public int Decode(byte[] bytes)
     {

@@ -1,6 +1,6 @@
 ﻿namespace TallyDB.Core.ByteConverters
 {
-  public class FloatConverter : IByteConverter<double>, IFixedLengthConverter
+  public class FloatConverter : IByteConverter<double>
   {
     public double Decode(byte[] bytes)
     {

@@ -2,7 +2,7 @@
 
 namespace TallyDB.Core.ByteConverters
 {
-  public class TextConverter : IByteConverter<string>, IFixedLengthConverter
+  public class TextConverter : IByteConverter<string>
   {
     public string Decode(byte[] bytes)
     {
