@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel;
-using TallyDB.Core.ByteConverters.Util;
 
 namespace TallyDB.Core.ByteConverters
 {
-  /// <summary>
-  /// Contains Slice Storage helper functions taking Slice Definitions
-  /// </summary>
-  public class SliceHeaderConverter: IByteConverter<SliceDefinition>
+    /// <summary>
+    /// Contains Slice Storage helper functions taking Slice Definitions
+    /// </summary>
+    public class SliceHeaderConverter: IByteConverter<SliceDefinition>
   {
     /// <summary>
     /// Reads a byte buffer and returns a SliceDefinition
@@ -78,6 +77,11 @@ namespace TallyDB.Core.ByteConverters
     public int GetFixedLength()
     {
       return 0;
+    }
+
+    public static int GetLengthByAxisCount(int axisCount)
+    {
+      return 41 + 33 * axisCount;
     }
   }
 }

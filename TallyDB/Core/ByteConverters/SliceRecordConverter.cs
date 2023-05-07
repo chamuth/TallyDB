@@ -2,7 +2,7 @@
 
 namespace TallyDB.Core.ByteConverters
 {
-  public class SliceRecordConverter : IByteConverter<SliceRecord>
+    public class SliceRecordConverter : IByteConverter<SliceRecord>
   {
     private SliceDefinition _definition;
 
@@ -47,7 +47,7 @@ namespace TallyDB.Core.ByteConverters
     {
       List<byte> values = new List<byte>();
 
-      var dateTimeConverter = new DateTimeConverter();
+      var dateTimeConverter = ByteConverter.GetForType<DateTime>();
       byte[] dateTime = dateTimeConverter.Encode(value.Time);
       values.AddRange(dateTime);
 
@@ -55,17 +55,17 @@ namespace TallyDB.Core.ByteConverters
       {
         if (datum.Type == DataType.TEXT)
         {
-          var converter = new TextConverter();
+          var converter = ByteConverter.GetForType<string>();
           values.AddRange(converter.Encode(datum.StringValue));
         }
         else if (datum.Type == DataType.FLOAT)
         {
-          var converter = new FloatConverter();
+          var converter = ByteConverter.GetForType<float>();
           values.AddRange(converter.Encode(float.Parse(datum.StringValue)));
         }
         else if (datum.Type == DataType.INT)
         {
-          var converter = new IntConverter();
+          var converter = ByteConverter.GetForType<int>();
           values.AddRange(converter.Encode(int.Parse(datum.StringValue)));
         }
       }
@@ -80,8 +80,11 @@ namespace TallyDB.Core.ByteConverters
         return 0;
       }
 
-      // TODO 
-      return 0;
+      return new DateTimeConverter().GetFixedLength() + _definition.Axes.Select((x) =>
+      {
+        var type = ByteConverter.TypeForDataType(x.Type);
+        return ByteConverter.GetForType(type).GetFixedLength();
+      }).Sum();
     }
   }
 }
