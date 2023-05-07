@@ -1,4 +1,6 @@
-﻿namespace TallyDB.Core.ByteConverters
+﻿using TallyDB.Core.ByteConverters.Util;
+
+namespace TallyDB.Core.ByteConverters
 {
   public class SliceRecordConverter : IByteConverter<SliceRecord>
   {
@@ -11,14 +13,43 @@
 
     public SliceRecord Decode(byte[] bytes)
     {
-      throw new NotImplementedException();
+      int skip = 0;
+
+      // load time
+      var dateTime = new DateTimeConverter();
+      var time = bytes.DecodeByteSlice(ref skip, dateTime);
+
+      // load records using slice definition
+      List<SliceRecordData> records = new List<SliceRecordData>();
+      foreach (var axis in _definition.Axes)
+      {
+        string stringValue = "";
+        switch (axis.Type)
+        {
+          case DataType.TEXT:
+            stringValue = bytes.DecodeByteSlice(ref skip, new TextConverter()).ToString();
+            break;
+          case DataType.INT:
+            stringValue = bytes.DecodeByteSlice(ref skip, new IntConverter()).ToString();
+            break;
+          case DataType.FLOAT:
+            stringValue = bytes.DecodeByteSlice(ref skip, new FloatConverter()).ToString();
+            break;
+        }
+
+        records.Add(new SliceRecordData(axis.Type, stringValue));
+      }
+
+      return new SliceRecord(records.ToArray(), time);
     }
 
     public byte[] Encode(SliceRecord value)
     {
+      List<byte> values = new List<byte>();
+
       var dateTimeConverter = new DateTimeConverter();
       byte[] dateTime = dateTimeConverter.Encode(value.Time);
-      List<byte> values = new List<byte>();
+      values.AddRange(dateTime);
 
       foreach(var datum in value.Data)
       {
@@ -39,7 +70,7 @@
         }
       }
 
-      return dateTime;
+      return values.ToArray();
     }
 
     public int GetFixedLength()

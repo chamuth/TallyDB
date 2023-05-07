@@ -16,11 +16,11 @@ namespace TallyDB.Core
 
     public override bool Equals(object? obj)
     {
-      if (obj == null)
+      if (obj == null || GetType() != obj.GetType())
       {
         return false;
       }
-      
+
       var other = (SliceDefinition)obj;
 
       if (other.Name != this.Name || other.Frequency != this.Frequency)
