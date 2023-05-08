@@ -12,7 +12,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       _sliceHeaderConverter = new TallyDB.Core.ByteConverters.SliceHeaderConverter();
     }
 
-    [TestMethod]
+    [TestMethod("Should convert for best case scenario")]
     public void EncodeDecode_ShouldConvertBestCaseSlice()
     {
       var name = "ExampleSlice";
@@ -32,7 +32,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       Assert.AreEqual(input, output);
     }
 
-    [TestMethod]
+    [TestMethod("Should convert empty slice definitions")]
     public void EncodeDecode_ShouldConvertEmptySliceDefinition()
     {
       var name = "ExampleSlice";

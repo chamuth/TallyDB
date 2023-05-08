@@ -1,6 +1,6 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using TallyDB.Core.ByteConverters;
+using TallyDB.Core.ByteConverters.Util;
 
 namespace TallyDB.Core
 {
@@ -12,7 +12,9 @@ namespace TallyDB.Core
     BinaryWriter _writer;
 
     SliceDefinition? _definition;
-    SliceRecordConverter? converter;
+    SliceRecordConverter? _converter;
+
+    DateTime? lastWrittenKey;
 
     ~Slice()
     {
@@ -35,8 +37,11 @@ namespace TallyDB.Core
       // Instantiate converter
       if (definition != null)
       {
-        converter = new SliceRecordConverter(definition);
+        _converter = new SliceRecordConverter(definition);
       }
+
+      // Load up last written key
+      LoadLastWrittenKey();
     }
 
     /// <summary>
@@ -55,20 +60,52 @@ namespace TallyDB.Core
       _writer.Flush();
     }
 
+    /// <summary>
+    /// Loads up and decodes slice definitoin from slice file 
+    /// </summary>
     public void LoadSliceDefinition()
     {
-      
+      // Read axis size byte
+      const int AXIS_SIZE_BYTE_INDEX = 33;
+      _stream.Seek(AXIS_SIZE_BYTE_INDEX, SeekOrigin.Begin);
+      var axisCount = _reader.ReadByte();
+      var length = SliceHeaderConverter.GetLengthByAxisCount(axisCount);
+
+      // Read and decode slice definition length
+      _stream.Seek(0, SeekOrigin.Begin);
+      var bytes = _reader.ReadBytes(length);
+      var converter = new SliceHeaderConverter();
+      var sliceDef = converter.Decode(bytes);
+
+      _definition = sliceDef;
+    }
+
+    /// <summary>
+    /// Loads last written key from disk
+    /// </summary>
+    public void LoadLastWrittenKey()
+    {
+      if (_converter == null)
+      {
+        return;
+      }
+
+      // Load last written key
+      var sliceRecordLength = _converter.GetFixedLength();
+      _stream.Seek(sliceRecordLength, SeekOrigin.End);
+      var converter = ByteConverter.GetForType<DateTime>();
+      lastWrittenKey = converter.Decode(_reader.ReadBytes(converter.GetFixedLength()));
     }
 
     public void Report(SliceRecord record)
     {
-      if (converter == null)
+      if (_converter == null)
       {
         return;
       }
 
       // Write to end of slice, TODO: Implement timing functions and etc.
-      var buffer = converter.Encode(record);
+      var buffer = _converter.Encode(record);
       _stream.Seek(0, SeekOrigin.End);
       _writer.Write(buffer);
     }

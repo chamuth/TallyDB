@@ -12,7 +12,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       _textConverter = new TallyDB.Core.ByteConverters.TextConverter();
     }
 
-    [TestMethod]
+    [TestMethod("Should convert text within limits")]
     public void Encode_ShouldConvertTextWithinLimit()
     {
       var input = "Example Text";
@@ -24,7 +24,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       CollectionAssert.AreEqual(expected, bytes);
     }
 
-    [TestMethod]
+    [TestMethod("Should convert text over the limit")]
     public void Encode_ShouldConvertTextOverLimit()
     {
       var input = "ThisTextGoesOverTheLimitOf32CharactersInItsName";
@@ -35,7 +35,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       CollectionAssert.AreEqual(expected, bytes);
     }
 
-    [TestMethod]
+    [TestMethod("Should convert empty text")]
     public void Encode_ShouldConvertEmptyText()
     {
       var input = "";
@@ -46,7 +46,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       CollectionAssert.AreEqual(expected, bytes);
     }
 
-    [TestMethod]
+    [TestMethod("Should encode/decode cycle within limit")]
     public void EncodeDecode_ShouldCycleWithinLimitEncoding()
     {
       var input = "test";
@@ -56,7 +56,7 @@ namespace TallyDB.Tests.Core.ByteConverters
       Assert.AreEqual(input, output);
     }
 
-    [TestMethod]
+    [TestMethod("Should encode/decode cycle over limit")]
     public void EncodeDecode_ShouldCycleOverLimitEncoding()
     {
       var input = "ThisTextGoesOverTheLimitOf32CharactersInItsName";
