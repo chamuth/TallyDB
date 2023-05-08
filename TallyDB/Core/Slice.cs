@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using TallyDB.Core.ByteConverters;
 using TallyDB.Core.ByteConverters.Util;
+using TallyDB.Core.Timing;
 
 namespace TallyDB.Core
 {
@@ -13,6 +14,7 @@ namespace TallyDB.Core
 
     SliceDefinition? _definition;
     SliceRecordConverter? _converter;
+    KeyTimer? _timer;
 
     DateTime? lastWrittenKey;
 
@@ -38,6 +40,7 @@ namespace TallyDB.Core
       if (definition != null)
       {
         _converter = new SliceRecordConverter(definition);
+        _timer = new KeyTimer(definition);
       }
 
       // Load up last written key
@@ -97,14 +100,14 @@ namespace TallyDB.Core
       lastWrittenKey = converter.Decode(_reader.ReadBytes(converter.GetFixedLength()));
     }
 
-    public void Report(SliceRecord record)
+    public void Report(SliceRecordData[] data)
     {
-      if (_converter == null)
+      if (_converter == null || _timer == null)
       {
         return;
       }
 
-      // Write to end of slice, TODO: Implement timing functions and etc.
+      var record = new SliceRecord(data, _timer.GetCurrent());
       var buffer = _converter.Encode(record);
       _stream.Seek(0, SeekOrigin.End);
       _writer.Write(buffer);
