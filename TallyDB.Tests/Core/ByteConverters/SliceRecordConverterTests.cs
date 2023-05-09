@@ -45,5 +45,20 @@ namespace TallyDB.Tests.Core.ByteConverters
       var input = sliceRecordConverter.Encode(sliceRecord);
       sliceRecordConverter.Decode(input);
     }
+
+    [TestMethod("Should consider averaging count dataset")]
+    public void EncodeDecode_ShouldConsiderAveragingCount()
+    {
+      var definition = new SliceRecordConverter(new SliceDefinition("NEW", new Axis[]
+      {
+        new Axis("temperature", DataType.FLOAT, AggregateFunction.AVG)
+      }, 1));
+
+      var input = new SliceRecord(new SliceRecordData[] { new SliceRecordData(DataType.FLOAT, "1.24") }, DateTime.Now);
+      var bytes = definition.Encode(input);
+      var output = definition.Decode(bytes);
+
+      Assert.AreEqual(input, output);
+    }
   }
 }

@@ -1,5 +1,8 @@
 ﻿namespace TallyDB.Core.Timing
 {
+  /// <summary>
+  /// Responsible for timing/period management
+  /// </summary>
   public class KeyTimer
   {
     private SliceDefinition _definition;

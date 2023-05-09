@@ -7,7 +7,6 @@ namespace TallyDB.Core
 {
   public class Slice
   {
-    string _name;
     FileStream _stream;
     BinaryReader _reader;
     BinaryWriter _writer;
@@ -28,8 +27,6 @@ namespace TallyDB.Core
     public Slice(string filename, SliceDefinition? definition)
     {
       _definition = definition;
-
-      _name = Path.GetFileNameWithoutExtension(filename);
 
       // Initialize IO readers and writers
       _stream = new FileStream(string.Format("{0}.{1}", filename, Constants.TallyExtension), FileMode.Open);
@@ -100,6 +97,10 @@ namespace TallyDB.Core
       lastWrittenKey = converter.Decode(_reader.ReadBytes(converter.GetFixedLength()));
     }
 
+    /// <summary>
+    /// Report slice record to the slice
+    /// </summary>
+    /// <param name="data">slice record data arary</param>
     public void Report(SliceRecordData[] data)
     {
       if (_converter == null || _timer == null)
@@ -107,7 +108,18 @@ namespace TallyDB.Core
         return;
       }
 
-      var record = new SliceRecord(data, _timer.GetCurrent());
+      var period = _timer.GetCurrent();
+
+      SliceRecord record;
+      if (period == lastWrittenKey)
+      {
+        record = new SliceRecord(data, (DateTime)lastWrittenKey);
+      }
+      else
+      {
+        record = new SliceRecord(data, _timer.GetCurrent());
+      }
+
       var buffer = _converter.Encode(record);
       _stream.Seek(0, SeekOrigin.End);
       _writer.Write(buffer);

@@ -27,13 +27,21 @@ namespace TallyDB.Core.ByteConverters
         switch (axis.Type)
         {
           case DataType.TEXT:
-            stringValue = bytes.DecodeByteSlice(ref skip, new TextConverter()).ToString();
+            stringValue = bytes.DecodeByteSlice(ref skip, ByteConverter.GetForType<string>()).ToString();
             break;
           case DataType.INT:
-            stringValue = bytes.DecodeByteSlice(ref skip, new IntConverter()).ToString();
+            stringValue = bytes.DecodeByteSlice(ref skip, ByteConverter.GetForType<int>()).ToString();
+            if (axis.Function == AggregateFunction.AVG)
+            {
+              skip += ByteConverter.GetForType<int>().GetFixedLength();
+            }
             break;
           case DataType.FLOAT:
             stringValue = bytes.DecodeByteSlice(ref skip, new FloatConverter()).ToString();
+            if (axis.Function == AggregateFunction.AVG)
+            {
+              skip += ByteConverter.GetForType<int>().GetFixedLength();
+            }
             break;
         }
 
@@ -51,8 +59,11 @@ namespace TallyDB.Core.ByteConverters
       byte[] dateTime = dateTimeConverter.Encode(value.Time);
       values.AddRange(dateTime);
 
-      foreach(var datum in value.Data)
+      for (var i = 0; i < value.Data.Length; i++)
       {
+        var datum = value.Data[i];
+        var axis = _definition.Axes[i];
+
         if (datum.Type == DataType.TEXT)
         {
           var converter = ByteConverter.GetForType<string>();
@@ -62,11 +73,21 @@ namespace TallyDB.Core.ByteConverters
         {
           var converter = ByteConverter.GetForType<float>();
           values.AddRange(converter.Encode(float.Parse(datum.StringValue)));
+
+          if (axis.Function == AggregateFunction.AVG)
+          {
+            values.AddRange(ByteConverter.GetForType<int>().Encode(1));
+          }
         }
         else if (datum.Type == DataType.INT)
         {
           var converter = ByteConverter.GetForType<int>();
           values.AddRange(converter.Encode(int.Parse(datum.StringValue)));
+
+          if (axis.Function == AggregateFunction.AVG)
+          {
+            values.AddRange(ByteConverter.GetForType<int>().Encode(1));
+          }
         }
       }
 
