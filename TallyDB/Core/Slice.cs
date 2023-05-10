@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using TallyDB.Core.Aggregation;
 using TallyDB.Core.ByteConverters;
 using TallyDB.Core.ByteConverters.Util;
 using TallyDB.Core.Timing;
@@ -14,8 +15,9 @@ namespace TallyDB.Core
     SliceDefinition? _definition;
     SliceRecordConverter? _converter;
     KeyTimer? _timer;
+    ComplexAggregator? _aggregator;
 
-    DateTime? lastWrittenKey;
+    SliceRecord? lastRecord;
 
     ~Slice()
     {
@@ -38,10 +40,11 @@ namespace TallyDB.Core
       {
         _converter = new SliceRecordConverter(definition);
         _timer = new KeyTimer(definition);
+        _aggregator = new ComplexAggregator(definition);
       }
 
       // Load up last written key
-      LoadLastWrittenKey();
+      LoadLastRecord();
     }
 
     /// <summary>
@@ -83,7 +86,7 @@ namespace TallyDB.Core
     /// <summary>
     /// Loads last written key from disk
     /// </summary>
-    public void LoadLastWrittenKey()
+    public void LoadLastRecord()
     {
       if (_converter == null)
       {
@@ -92,9 +95,8 @@ namespace TallyDB.Core
 
       // Load last written key
       var sliceRecordLength = _converter.GetFixedLength();
-      _stream.Seek(sliceRecordLength, SeekOrigin.End);
-      var converter = ByteConverter.GetForType<DateTime>();
-      lastWrittenKey = converter.Decode(_reader.ReadBytes(converter.GetFixedLength()));
+      _stream.Seek(-sliceRecordLength, SeekOrigin.End);
+      lastRecord = _converter.Decode(_reader.ReadBytes(sliceRecordLength));
     }
 
     /// <summary>
@@ -103,7 +105,7 @@ namespace TallyDB.Core
     /// <param name="data">slice record data arary</param>
     public void Report(SliceRecordData[] data)
     {
-      if (_converter == null || _timer == null)
+      if (_converter == null || _timer == null || _aggregator == null)
       {
         return;
       }
@@ -111,15 +113,21 @@ namespace TallyDB.Core
       var period = _timer.GetCurrent();
 
       SliceRecord record;
-      if (period == lastWrittenKey)
+      if (period == lastRecord?.Time)
       {
-        record = new SliceRecord(data, (DateTime)lastWrittenKey);
+        // Aggregation
+        record = _aggregator.Aggregate(lastRecord, data);
       }
       else
       {
+        // Brand new record
         record = new SliceRecord(data, _timer.GetCurrent());
       }
 
+      // Set last record
+      lastRecord = record;
+
+      // Write to buffer
       var buffer = _converter.Encode(record);
       _stream.Seek(0, SeekOrigin.End);
       _writer.Write(buffer);
