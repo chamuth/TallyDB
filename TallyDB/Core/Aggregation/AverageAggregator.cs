@@ -1,8 +1,13 @@
-﻿using TallyDB.Core.Exceptions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TallyDB.Core.Exceptions;
 
 namespace TallyDB.Core.Aggregation
 {
-  public class SumAggregator : Aggregator
+  public class AverageAggregator : Aggregator
   {
     public override SliceRecordData Aggregate(SliceRecordData a, SliceRecordData b)
     {
@@ -15,6 +20,7 @@ namespace TallyDB.Core.Aggregation
         var final = (aValue + bValue).ToString();
 
         a.StringValue = final;
+        a.RunnerValue++;
 
         return a;
       }
