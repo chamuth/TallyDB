@@ -1,15 +1,16 @@
 ﻿using System.Text;
+using TallyDB.Core.ByteConverters;
 
 namespace TallyDB.Tests.Core.ByteConverters
 {
   [TestClass]
-  public class TextConverter
+  public class TextConverterTests
   {
-    private readonly TallyDB.Core.ByteConverters.TextConverter _textConverter;
+    private readonly TextConverter _textConverter;
 
-    public TextConverter()
+    public TextConverterTests()
     {
-      _textConverter = new TallyDB.Core.ByteConverters.TextConverter();
+      _textConverter = new TextConverter();
     }
 
     [TestMethod("Should convert text within limits")]

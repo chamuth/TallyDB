@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TallyDB.Core.ByteConverters;
+﻿using TallyDB.Core.ByteConverters;
 
 namespace TallyDB.Tests.Core.ByteConverters
 {
   [TestClass]
-  public class SliceRecordConverter
+  public class SliceRecordConverterTests
   {
-    private readonly TallyDB.Core.ByteConverters.SliceRecordConverter sliceRecordConverter;
+    private readonly SliceRecordConverter sliceRecordConverter;
 
-    public SliceRecordConverter()
+    public SliceRecordConverterTests()
     {
       var definition = new SliceDefinition(
         "example", new Axis[]
@@ -22,7 +17,7 @@ namespace TallyDB.Tests.Core.ByteConverters
         1 / 10f
       );
 
-      sliceRecordConverter = new TallyDB.Core.ByteConverters.SliceRecordConverter(definition);
+      sliceRecordConverter = new SliceRecordConverter(definition);
     }
 
     [TestMethod("Should convert best case scenario")]
@@ -49,6 +44,21 @@ namespace TallyDB.Tests.Core.ByteConverters
 
       var input = sliceRecordConverter.Encode(sliceRecord);
       sliceRecordConverter.Decode(input);
+    }
+
+    [TestMethod("Should consider averaging count dataset")]
+    public void EncodeDecode_ShouldConsiderAveragingCount()
+    {
+      var definition = new SliceRecordConverter(new SliceDefinition("NEW", new Axis[]
+      {
+        new Axis("temperature", DataType.FLOAT, AggregateFunction.AVG)
+      }, 1));
+
+      var input = new SliceRecord(new SliceRecordData[] { new SliceRecordData(DataType.FLOAT, "1.24") }, DateTime.Now);
+      var bytes = definition.Encode(input);
+      var output = definition.Decode(bytes);
+
+      Assert.AreEqual(input, output);
     }
   }
 }

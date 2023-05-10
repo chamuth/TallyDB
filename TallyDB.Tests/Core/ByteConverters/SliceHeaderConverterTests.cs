@@ -1,15 +1,17 @@
 ﻿
 
+using TallyDB.Core.ByteConverters;
+
 namespace TallyDB.Tests.Core.ByteConverters
 {
   [TestClass]
-  public class SliceHeaderConverter
+  public class SliceHeaderConverterTests
   {
-    private readonly TallyDB.Core.ByteConverters.SliceHeaderConverter _sliceHeaderConverter;
+    private readonly SliceHeaderConverter _sliceHeaderConverter;
 
-    public SliceHeaderConverter()
+    public SliceHeaderConverterTests()
     {
-      _sliceHeaderConverter = new TallyDB.Core.ByteConverters.SliceHeaderConverter();
+      _sliceHeaderConverter = new SliceHeaderConverter();
     }
 
     [TestMethod("Should convert for best case scenario")]
