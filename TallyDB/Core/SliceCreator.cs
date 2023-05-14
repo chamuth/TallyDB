@@ -23,9 +23,9 @@
       }
 
       // Return created storage
-      var slice = new Slice(filename, definition);
+      var slice = new Slice(filename);
       // Store definition
-      slice.UpdateSliceDefinition();
+      slice.Create(definition);
 
       return slice;
     }

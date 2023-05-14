@@ -28,8 +28,18 @@
 
     public DateTime GetCurrent()
     {
-      var frequency = _definition.Frequency;
-      return GetCurrentPeriodStartAndEnd(DateTime.Now, frequency).Start;
+      return GetCurrentPeriodStartAndEnd(DateTime.Now, _definition.Frequency).Start;
+    }
+
+    public DateTime GetPeriodFor(DateTime date)
+    {
+      return GetCurrentPeriodStartAndEnd(date, _definition.Frequency).Start;
+    }
+
+    public int PeriodsBetween(DateTime start, DateTime end)
+    {
+      var periods = (end - start).TotalHours / _definition.Frequency;
+      return (int)MathF.Floor((float)periods);
     }
   }
 }
