@@ -1,6 +1,4 @@
-﻿using TallyDB.Core.ByteConverters.Util;
-
-namespace TallyDB.Core.ByteConverters
+﻿namespace TallyDB.Core.ByteConverters
 {
   public class SliceRecordConverter : IByteConverter<SliceRecord>
   {

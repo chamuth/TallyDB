@@ -1,4 +1,4 @@
-﻿namespace TallyDB.Core.ByteConverters.Util
+﻿namespace TallyDB.Core.ByteConverters
 {
   public static class ByteConverter
   {
@@ -11,14 +11,14 @@
     {
       if (typeof(T) == typeof(string))
       {
-        return (IByteConverter<T>) textConverter;
+        return (IByteConverter<T>)textConverter;
       }
-      
+
       if (typeof(T) == typeof(float))
       {
         return (IByteConverter<T>)floatConverter;
       }
-      
+
       if (typeof(T) == typeof(int))
       {
         return (IByteConverter<T>)intConverter;

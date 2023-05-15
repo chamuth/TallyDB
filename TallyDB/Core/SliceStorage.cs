@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using TallyDB.Core.Aggregation;
 using TallyDB.Core.ByteConverters;
 using TallyDB.Core.Timing;
@@ -20,10 +21,7 @@ namespace TallyDB.Core
 
     SliceDefinition? _definition;
 
-    SliceRecord? lastRecord;
-    SliceRecord? firstRecord;
-
-    List<SliceRecord> cachedData;
+    List<SliceRecord> cachedData = new List<SliceRecord>();
 
     ~SliceStorage()
     {
@@ -41,7 +39,7 @@ namespace TallyDB.Core
 
     }
 
-    #region PRIVATE METHODS
+    #region Private Methods
     /// <summary>
     /// Initialize slice definition dependent services
     /// </summary>
@@ -54,11 +52,16 @@ namespace TallyDB.Core
         _aggregator = new ComplexAggregator(_definition);
 
         // Load last and first records
-        Last();
-        First();
+        var first = Last();
+        var last = First();
+
+        if (first == null || last == null)
+        {
+          return;
+        }
 
         // Initialize cache storage for data entry
-        cachedData = new List<SliceRecord>(_timer.PeriodsBetween(First().Time, Last().Time));
+        cachedData = new List<SliceRecord>(_timer.PeriodsBetween(first.Time, last.Time));
       }
     }
 
@@ -81,7 +84,7 @@ namespace TallyDB.Core
     /// </summary>
     /// <param name="start">Offset in bytes</param>
     /// <returns></returns>
-    private SliceRecord? ReadRecordFromDisk(long start)
+    private SliceRecord? ReadRecordByIndexFromDisk(int index)
     {
       if (_converter == null || _definition == null)
       {
@@ -91,9 +94,73 @@ namespace TallyDB.Core
       if (IsSliceDataAvailable())
       {
         // Load last written key
-        _stream.Seek(start, SeekOrigin.Begin);
+        var headerSize = SliceHeaderConverter.GetLengthByAxisCount(_definition.Axes.Length);
         var sliceRecordLength = _converter.GetFixedLength();
+        _stream.Seek(headerSize + index * sliceRecordLength, SeekOrigin.Begin);
         return _converter.Decode(_reader.ReadBytes(sliceRecordLength));
+      }
+
+      return null;
+    }
+
+    /// <summary>
+    /// Get number of slice records saved in disk
+    /// </summary>
+    /// <returns>No of slice records saved</returns>
+    private int GetSliceRecordCountInDisk()
+    {
+      if (_definition == null || _converter == null || !IsSliceDataAvailable())
+      {
+        return 0;
+      }
+
+      return (int)(_stream.Length - SliceHeaderConverter.GetLengthByAxisCount(_definition.Axes.Length)) / _converter.GetFixedLength();
+    }
+
+    /// <summary>
+    /// Search disk and find slice record by period
+    /// </summary>
+    /// <param name="period"></param>
+    /// <returns></returns>
+    private int FindIndexInDisk(DateTime period)
+    {
+      if (_definition == null|| !IsSliceDataAvailable())
+      {
+        return -1;
+      }
+
+      // Hard load index if first or last
+      if (period == cachedData.First().Time)
+      {
+        return 0;
+      }
+      if (period == cachedData.Last().Time)
+      {
+        return cachedData.Count - 1;
+      }
+
+      // Search disk binary
+      var count = GetSliceRecordCountInDisk();
+
+      //TODO: Implement search here
+      return 0;
+    }
+
+    private SliceRecord[] GetWithinRange(DateTime startPeriod, DateTime endPeriod)
+    {
+      var firstRecord = First();
+      if (firstRecord == null || _timer == null)
+      {
+        return new SliceRecord[] { };
+      }
+
+      var periodsCount = _timer.PeriodsBetween(startPeriod, endPeriod);
+      var offsetIndex = _timer.PeriodsBetween(firstRecord.Time, startPeriod);
+
+      // Check cache to see if we have the values within period
+      if (cachedData[offsetIndex].Time == startPeriod)
+      {
+
       }
 
       return null;
@@ -141,11 +208,12 @@ namespace TallyDB.Core
     /// <summary>
     /// Loads last written slice data from disk
     /// </summary>
-    public SliceRecord Last()
+    public SliceRecord? Last()
     {
-      if (lastRecord != null)
+      if (cachedData.Last() != null)
       {
-        return lastRecord;
+        // Return from cache
+        return cachedData.Last();
       }
 
       if (_converter == null)
@@ -154,19 +222,27 @@ namespace TallyDB.Core
       }
 
       var sliceRecordLength = _converter.GetFixedLength();
-      lastRecord = ReadRecordFromDisk(_stream.Length - sliceRecordLength);
-      return lastRecord;
+      var sliceRecord = ReadRecordByIndexFromDisk(GetSliceRecordCountInDisk() - 1);
+
+      if (sliceRecord == null)
+      {
+        return null;
+      }
+
+      cachedData[cachedData.Count - 1] = sliceRecord;
+      return sliceRecord;
     }
 
     /// <summary>
     /// Get first written slice data from the disk
     /// </summary>
     /// <returns></returns>
-    public SliceRecord First()
+    public SliceRecord? First()
     {
-      if (firstRecord != null )
+      if (cachedData[0] != null )
       {
-        return firstRecord;
+        // Return from cache
+        return cachedData[0];
       }
 
       if (_definition == null || _converter == null)
@@ -174,9 +250,16 @@ namespace TallyDB.Core
         return null;
       }
 
-      var skip = SliceHeaderConverter.GetLengthByAxisCount(_definition.Axes.Length);
-      firstRecord = ReadRecordFromDisk(skip);
-      return firstRecord;
+      // Load first index slice form disk
+      var sliceRecord = ReadRecordByIndexFromDisk(0);
+
+      if (sliceRecord == null)
+      {
+        return null;
+      }
+      
+      cachedData[0] = sliceRecord;
+      return sliceRecord;
     }
 
     /// <summary>
@@ -194,10 +277,7 @@ namespace TallyDB.Core
 
       SliceRecord record;
 
-      if (lastRecord == null)
-      {
-        lastRecord = Last();
-      }
+      var lastRecord = Last();
 
       if (period == lastRecord?.Time)
       {
@@ -230,11 +310,10 @@ namespace TallyDB.Core
     {
       get
       {
-        List<SliceRecord> sliceRecords = new List<SliceRecord>();
 
         if (_timer == null)
         {
-          return sliceRecords.ToArray();
+          return new SliceRecord[] { };
         }
 
         var startPeriod = _timer.GetPeriodFor(start);
@@ -242,11 +321,10 @@ namespace TallyDB.Core
 
         if (startPeriod == endPeriod)
         {
-          // Empty period given
-          return sliceRecords.ToArray();
+          return new SliceRecord[] { };
         }
 
-        return sliceRecords.ToArray();
+        return GetWithinRange(startPeriod, endPeriod);
       }
     }
   }
