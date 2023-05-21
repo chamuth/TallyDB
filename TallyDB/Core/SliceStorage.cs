@@ -21,7 +21,14 @@ namespace TallyDB.Core
 
     SliceDefinition? _definition;
 
+    /// <summary>
+    /// Cache container datasource
+    /// </summary>
     List<SliceRecord> cachedData = new List<SliceRecord>();
+    int cachedCount = Constants.DefaultCacheExtensionCount;
+
+    SliceRecord? firstRecord;
+    SliceRecord? lastRecord;
 
     ~SliceStorage()
     {
@@ -36,7 +43,6 @@ namespace TallyDB.Core
       _stream = new FileStream(string.Format("{0}.{1}", filename, Constants.TallyExtension), FileMode.Open);
       _reader = new BinaryReader(_stream, Encoding.UTF8);
       _writer = new BinaryWriter(_stream, Encoding.UTF8);
-
     }
 
     #region Private Methods
@@ -52,16 +58,16 @@ namespace TallyDB.Core
         _aggregator = new ComplexAggregator(_definition);
 
         // Load last and first records
-        var first = Last();
-        var last = First();
+        var first = First();
+        var last = Last();
 
         if (first == null || last == null)
         {
           return;
         }
 
-        // Initialize cache storage for data entry
-        cachedData = new List<SliceRecord>(_timer.PeriodsBetween(first.Time, last.Time));
+        // Fetch cache data and initialize cache data storage
+        FetchCacheRecords();
       }
     }
 
@@ -83,7 +89,7 @@ namespace TallyDB.Core
     /// Read slice from disk using the start offset
     /// </summary>
     /// <param name="start">Offset in bytes</param>
-    /// <returns></returns>
+    /// <returns>Null if slice data not available</returns>
     private SliceRecord? ReadRecordByIndexFromDisk(int index)
     {
       if (_converter == null || _definition == null)
@@ -104,6 +110,42 @@ namespace TallyDB.Core
     }
 
     /// <summary>
+    /// Read array of records from the disk with how many to read from the end.
+    /// </summary>
+    /// <param name="countFromLast">How many slice records to be read from the end</param>
+    /// <param name="offset">How many to skip from last</param>
+    /// <returns>Slice record array of count from end</returns>
+    private SliceRecord[] ReadRecordArrayByIndexFromDisk(int countFromLast, int offset = 0)
+    {
+      var result = new SliceRecord[] { };
+
+      if (_converter == null || _definition == null)
+      {
+        return result;
+      }
+
+      if (IsSliceDataAvailable())
+      {
+        // Select number of bytes to read if count is greater or less
+        var count = GetSliceRecordCountInDisk();
+        int sliceSize = _converter.GetFixedLength();
+        var bytesToRead = ((count > countFromLast) ? countFromLast : count) * sliceSize;
+        var skipFromLast = offset * sliceSize;
+
+        // Read bytes and transfer into chunks
+        _stream.Seek(-(bytesToRead + skipFromLast), SeekOrigin.End);
+        var bytes = _reader.ReadBytes(bytesToRead);
+        var byteChunks = bytes.SplitArray(_converter.GetFixedLength());
+
+        result = byteChunks
+          .Select((byteArray) => _converter.Decode(byteArray))
+          .ToArray();
+      }
+
+      return result;
+    }
+
+    /// <summary>
     /// Get number of slice records saved in disk
     /// </summary>
     /// <returns>No of slice records saved</returns>
@@ -114,56 +156,102 @@ namespace TallyDB.Core
         return 0;
       }
 
-      return (int)(_stream.Length - SliceHeaderConverter.GetLengthByAxisCount(_definition.Axes.Length)) / _converter.GetFixedLength();
+      var size = _converter.GetFixedLength();
+      var remainingLength = (_stream.Length - SliceHeaderConverter.GetLengthByAxisCount(_definition.Axes.Length));
+      var value = remainingLength / size;
+
+      return (int)value;
     }
 
     /// <summary>
-    /// Search disk and find slice record by period
+    /// Read records from cache or prefetch cache if required
     /// </summary>
-    /// <param name="period"></param>
+    /// <param name="startPeriod"></param>
+    /// <param name="endPeriod"></param>
     /// <returns></returns>
-    private int FindIndexInDisk(DateTime period)
-    {
-      if (_definition == null|| !IsSliceDataAvailable())
-      {
-        return -1;
-      }
-
-      // Hard load index if first or last
-      if (period == cachedData.First().Time)
-      {
-        return 0;
-      }
-      if (period == cachedData.Last().Time)
-      {
-        return cachedData.Count - 1;
-      }
-
-      // Search disk binary
-      var count = GetSliceRecordCountInDisk();
-
-      //TODO: Implement search here
-      return 0;
-    }
-
     private SliceRecord[] GetWithinRange(DateTime startPeriod, DateTime endPeriod)
     {
-      var firstRecord = First();
-      if (firstRecord == null || _timer == null)
+      var result = new SliceRecord[] { };
+      if (_timer == null)
       {
-        return new SliceRecord[] { };
+        return result;
       }
 
-      var periodsCount = _timer.PeriodsBetween(startPeriod, endPeriod);
-      var offsetIndex = _timer.PeriodsBetween(firstRecord.Time, startPeriod);
-
-      // Check cache to see if we have the values within period
-      if (cachedData[offsetIndex].Time == startPeriod)
+      if (cachedData.First().Time <= startPeriod)
       {
+        // Required range overlaps cached range
+        result = cachedData
+          .Where((record) => record.Time >= startPeriod && record.Time <= endPeriod)
+          .OrderBy(x => x.Time)
+          .ToArray();
+      }
+      else
+      {
+        // Increase cache size and retry
+        IncreaseCacheSize();
+        result = GetWithinRange(startPeriod, endPeriod);
+      }
+      
+      return result;
+    }
 
+    /// <summary>
+    /// Increases cache size based on a predefined amount
+    /// </summary>
+    private void IncreaseCacheSize()
+    {
+      int previous = cachedCount;
+      cachedCount += cachedCount;
+
+      // Read only increased count skipping already loaded ones
+      FetchCacheRecords(previous);
+    }
+
+    /// <summary>
+    /// Fetch cache records from the disk and extend cache size (requires memory management implementation)
+    /// <param name="skip"></param>
+    /// </summary>
+    private void FetchCacheRecords(int skip = 0)
+    {
+      if (_timer == null)
+      {
+        return;
       }
 
-      return null;
+      cachedData = new List<SliceRecord>(ReadRecordArrayByIndexFromDisk(cachedCount, skip));
+    }
+
+    /// <summary>
+    /// Get gap filled records for all periods within given timeframe
+    /// </summary>
+    /// <param name="from">Timeframe start</param>
+    /// <param name="to">Timeframe end</param>
+    /// <param name="dataset">Array of records</param>
+    /// <returns>Gap filled slice records</returns>
+    private SliceRecord[] GetGapFilledRecords(DateTime from, DateTime to, SliceRecord[] dataset)
+    {
+      var result = new List<SliceRecord>();
+      
+      if (_definition == null)
+      {
+        return result.ToArray();
+      }
+
+      while(from == to)
+      {
+        var record = dataset.Where(r => r.Time == from);
+
+        if (record.Count() == 0) {
+          // Add default slice record
+          result.Add(new SliceRecord(new SliceRecordData[] { }, from));
+          continue;
+        }
+
+        // Insert found record
+        result.Add(record.First());
+      }
+
+      return result.ToArray();
     }
     #endregion
 
@@ -173,7 +261,7 @@ namespace TallyDB.Core
     public SliceDefinition LoadSliceDefinition()
     {
       // Read axis size byte
-      const int AXIS_SIZE_BYTE_INDEX = 33;
+      const int AXIS_SIZE_BYTE_INDEX = 32;
       _stream.Seek(AXIS_SIZE_BYTE_INDEX, SeekOrigin.Begin);
       var axisCount = _reader.ReadByte();
       var length = SliceHeaderConverter.GetLengthByAxisCount(axisCount);
@@ -210,10 +298,10 @@ namespace TallyDB.Core
     /// </summary>
     public SliceRecord? Last()
     {
-      if (cachedData.Last() != null)
+      if (lastRecord != null)
       {
         // Return from cache
-        return cachedData.Last();
+        return lastRecord;
       }
 
       if (_converter == null)
@@ -221,15 +309,15 @@ namespace TallyDB.Core
         return null;
       }
 
-      var sliceRecordLength = _converter.GetFixedLength();
-      var sliceRecord = ReadRecordByIndexFromDisk(GetSliceRecordCountInDisk() - 1);
+      var sliceRecordCount = GetSliceRecordCountInDisk() - 1;
+      var sliceRecord = ReadRecordByIndexFromDisk(sliceRecordCount);
 
       if (sliceRecord == null)
       {
         return null;
       }
 
-      cachedData[cachedData.Count - 1] = sliceRecord;
+      lastRecord = sliceRecord;
       return sliceRecord;
     }
 
@@ -239,10 +327,10 @@ namespace TallyDB.Core
     /// <returns></returns>
     public SliceRecord? First()
     {
-      if (cachedData[0] != null )
+      if (firstRecord != null )
       {
         // Return from cache
-        return cachedData[0];
+        return firstRecord;
       }
 
       if (_definition == null || _converter == null)
@@ -257,8 +345,8 @@ namespace TallyDB.Core
       {
         return null;
       }
-      
-      cachedData[0] = sliceRecord;
+
+      firstRecord = sliceRecord;
       return sliceRecord;
     }
 
@@ -310,7 +398,6 @@ namespace TallyDB.Core
     {
       get
       {
-
         if (_timer == null)
         {
           return new SliceRecord[] { };
@@ -324,7 +411,10 @@ namespace TallyDB.Core
           return new SliceRecord[] { };
         }
 
-        return GetWithinRange(startPeriod, endPeriod);
+        var records = GetWithinRange(startPeriod, endPeriod);
+        var gapFilledRecords = GetGapFilledRecords(startPeriod, endPeriod, records);
+
+        return gapFilledRecords;
       }
     }
   }

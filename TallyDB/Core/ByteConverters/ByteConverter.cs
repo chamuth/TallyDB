@@ -32,6 +32,24 @@
       throw new Exception();
     }
 
+    public static int GetFixedLengthForType(DataType type)
+    {
+      if (type == DataType.TEXT)
+      {
+        return textConverter.GetFixedLength();
+      }
+      else if (type == DataType.INT)
+      {
+        return intConverter.GetFixedLength();
+      }
+      else if (type == DataType.FLOAT)
+      {
+        return floatConverter.GetFixedLength();
+      }
+
+      throw new Exception("Unknown DataType input for GetFixedLengthForType");
+    }
+
     public static Type TypeForDataType(DataType type)
     {
       if (type == DataType.TEXT)

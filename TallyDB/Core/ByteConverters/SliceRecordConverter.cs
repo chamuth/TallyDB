@@ -108,11 +108,15 @@
         return 0;
       }
 
-      return new DateTimeConverter().GetFixedLength() + _definition.Axes.Select((x) =>
+      var count = ByteConverter.GetForType<DateTime>().GetFixedLength();
+
+      foreach (var axis in _definition.Axes)
       {
-        var type = ByteConverter.TypeForDataType(x.Type);
-        return ByteConverter.GetForType(type).GetFixedLength();
-      }).Sum();
+        var type = ByteConverter.TypeForDataType(axis.Type);
+        count += ByteConverter.GetFixedLengthForType(axis.Type);
+      }
+
+      return count;
     }
   }
 }

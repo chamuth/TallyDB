@@ -1,11 +1,12 @@
 ﻿using TallyDB.Core;
+using TallyDB.Core.ByteConverters;
 using TallyDB.Core.Timing;
 
 namespace TallyDB.Mock.Slice
 {
   public class MockSliceCreator : MockCreator
   {
-    public MockSliceCreator(int? seed) : base(seed) { }
+    public MockSliceCreator(int? seed = null) : base(seed) { }
 
     private Axis[] GetRandomAxis(int length)
     {
@@ -14,7 +15,7 @@ namespace TallyDB.Mock.Slice
       for (var i = 0; i < length; i++)
       {
         DataType type = DataType.FLOAT;
-        AggregateFunction function = (AggregateFunction)random.Next(1, 4);
+        AggregateFunction function = AggregateFunction.SUM;
         axes[i] = new Axis("axis" + (i + 1).ToString(), type, function);
       }
 
@@ -39,12 +40,12 @@ namespace TallyDB.Mock.Slice
       return records.ToArray();
     }
 
-    public override void Create(string name)
+    public void Create(string name, out SliceDefinition def, out SliceRecord[] records)
     {
-      var axesCount = random.Next(1, 3);
+      var axesCount = 2;
       var frequency = random.Next(2, 5) * 0.5f;
 
-      var def = new SliceDefinition(name, GetRandomAxis(axesCount), frequency);
+      def = new SliceDefinition(name, GetRandomAxis(axesCount), frequency);
       var keyTimer = new KeyTimer(def);
       var startPeriod = keyTimer.GetPeriodFor(new DateTime(
         random.Next(2001, 2010), random.Next(1, 12), random.Next(2, 20),
@@ -52,8 +53,19 @@ namespace TallyDB.Mock.Slice
       ));
 
       // Add slice data
-      var sliceCount = random.Next(200, 200);
-      var records = GetSliceRecordData(sliceCount, def, startPeriod);
+      var sliceCount = random.Next(100, 500);
+      records = GetSliceRecordData(sliceCount, def, startPeriod);
+
+      // Encode
+      var recordConverter = new SliceRecordConverter(def);
+      var headerBytes = new SliceHeaderConverter().Encode(def);
+      var recordBytes = records.Select((record) => recordConverter.Encode(record)).ToArray().ConcatTogether();
+
+      var finalBytes = headerBytes.Concat(recordBytes).ToArray();
+
+      var file = Storage.Join(string.Format("mock\\{0}.tally", def.Name));
+      Storage.CreateDirectory(Storage.Join("mock\\"));
+      File.WriteAllBytes(file, finalBytes);
     }
   }
 }

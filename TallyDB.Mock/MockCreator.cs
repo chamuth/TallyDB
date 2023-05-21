@@ -15,7 +15,5 @@
         random = new Random();
       }
     }
-
-    public abstract void Create(string name);
   }
 }
