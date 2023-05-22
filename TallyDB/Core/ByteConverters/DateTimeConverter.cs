@@ -1,6 +1,6 @@
 ﻿namespace TallyDB.Core.ByteConverters
 {
-  public class DateTimeConverter : IByteConverter<DateTime>, IFixedLengthConverter
+  public class DateTimeConverter : IByteConverter<DateTime>
   {
     public DateTime Decode(byte[] bytes)
     {

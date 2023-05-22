@@ -1,71 +1,50 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
+using TallyDB.Core.Aggregation;
 using TallyDB.Core.ByteConverters;
+using TallyDB.Core.Timing;
 
 namespace TallyDB.Core
 {
   public class Slice
   {
-    string _name;
-    FileStream _stream;
-    BinaryReader _reader;
-    BinaryWriter _writer;
+    SliceStorage storage;
 
-    SliceDefinition? _definition;
-    SliceRecordConverter? converter;
-
-    ~Slice()
+    public Slice(string filename)
     {
-      _reader.Close();
-      _writer.Close();
-      _stream.Dispose();
-    }
-
-    public Slice(string filename, SliceDefinition? definition)
-    {
-      _definition = definition;
-
-      _name = Path.GetFileNameWithoutExtension(filename);
-
-      // Initialize IO readers and writers
-      _stream = new FileStream(string.Format("{0}.{1}", filename, Constants.TallyExtension), FileMode.Open);
-      _reader = new BinaryReader(_stream, Encoding.UTF8);
-      _writer = new BinaryWriter(_stream, Encoding.UTF8);
-
-      // Instantiate converter
-      if (definition != null)
-      {
-        converter = new SliceRecordConverter(definition);
-      }
+      storage = new SliceStorage(filename);
     }
 
     /// <summary>
-    /// Stores and updates slice definitions into slice file
+    /// Create new Slice using provided slice definition
     /// </summary>
-    public void UpdateSliceDefinition()
+    /// <param name="newDefinition">New Slice definition</param>
+    public void Create(SliceDefinition newDefinition)
     {
-      if (_definition == null)
-      {
-        return;
-      }
-
-      var converter = new SliceHeaderConverter();
-      byte[] buffer = converter.Encode(_definition);
-      _writer.Write(buffer, 0, buffer.Length);
-      _writer.Flush();
+      storage.SaveSliceDefinition(newDefinition);
     }
 
-    public void Report(SliceRecord record)
+    /// <summary>
+    /// Load slice definition from the disk
+    /// </summary>
+    public void Load()
     {
-      if (converter == null)
-      {
-        return;
-      }
+      storage.LoadSliceDefinition();
+    }
 
-      // Write to end of slice, TODO: Implement timing functions and etc.
-      var buffer = converter.Encode(record);
-      _stream.Seek(0, SeekOrigin.End);
-      _writer.Write(buffer);
+    /// <summary>
+    /// Query slice data based on period
+    /// </summary>
+    /// <param name="start">Start of the render period</param>
+    /// <param name="end">End of the render period</param>
+    /// <param name="resolution">Minimum resolution as a multiply of period time of the slice. If period time of the slice is 1 hour and resolution is set as 2, the length between two points in results is 2 hours.</param>
+    public void Query(DateTime start, DateTime end, float resolution)
+    {
+
+    }
+
+    public void Insert(SliceRecordData[] data)
+    {
+      storage.Insert(data);
     }
   }
 }

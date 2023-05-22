@@ -2,7 +2,7 @@
   "profiles": {
     "tallydb": {
       "commandName": "Project",
-      "commandLineArgs": "--port=4053"
+      "workingDirectory": "C:\\Users\\User\\Projects\\tallydb\\TallyDB\\bin\\Debug"
     }
   }
 }

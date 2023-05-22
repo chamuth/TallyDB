@@ -1,19 +1,20 @@
 ﻿using System.Text;
+using TallyDB.Core.ByteConverters;
 
 namespace TallyDB.Tests.Core.ByteConverters
 {
   [TestClass]
-  public class TextConverter
+  public class TextConverterTests
   {
-    private readonly TallyDB.Core.ByteConverters.TextConverter _textConverter;
+    private readonly TextConverter _textConverter;
 
-    public TextConverter()
+    public TextConverterTests()
     {
-      _textConverter = new TallyDB.Core.ByteConverters.TextConverter();
+      _textConverter = new TextConverter();
     }
 
-    [TestMethod]
-    public void TextConverter_ShouldConvertTextWithinLimit()
+    [TestMethod("Should convert text within limits")]
+    public void Encode_ShouldConvertTextWithinLimit()
     {
       var input = "Example Text";
       var expected = new byte[32] {
@@ -24,8 +25,8 @@ namespace TallyDB.Tests.Core.ByteConverters
       CollectionAssert.AreEqual(expected, bytes);
     }
 
-    [TestMethod]
-    public void TextConverter_ShouldConvertTextOverLimit()
+    [TestMethod("Should convert text over the limit")]
+    public void Encode_ShouldConvertTextOverLimit()
     {
       var input = "ThisTextGoesOverTheLimitOf32CharactersInItsName";
       var expected = Encoding.ASCII.GetBytes("ThisTextGoesOverTheLimitOf32Char");
@@ -35,8 +36,8 @@ namespace TallyDB.Tests.Core.ByteConverters
       CollectionAssert.AreEqual(expected, bytes);
     }
 
-    [TestMethod]
-    public void TextConverter_ShouldConvertEmptyText()
+    [TestMethod("Should convert empty text")]
+    public void Encode_ShouldConvertEmptyText()
     {
       var input = "";
       var expected = new byte[32];
@@ -46,8 +47,8 @@ namespace TallyDB.Tests.Core.ByteConverters
       CollectionAssert.AreEqual(expected, bytes);
     }
 
-    [TestMethod]
-    public void TextConverter_ShouldCycleWithinLimitEncoding()
+    [TestMethod("Should encode/decode cycle within limit")]
+    public void EncodeDecode_ShouldCycleWithinLimitEncoding()
     {
       var input = "test";
       var encoded = _textConverter.Encode(input);
@@ -56,8 +57,8 @@ namespace TallyDB.Tests.Core.ByteConverters
       Assert.AreEqual(input, output);
     }
 
-    [TestMethod]
-    public void TextConverter_ShouldCycleOverLimitEncoding()
+    [TestMethod("Should encode/decode cycle over limit")]
+    public void EncodeDecode_ShouldCycleOverLimitEncoding()
     {
       var input = "ThisTextGoesOverTheLimitOf32CharactersInItsName";
       var encoded = _textConverter.Encode(input);

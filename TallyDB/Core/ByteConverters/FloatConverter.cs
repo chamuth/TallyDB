@@ -1,13 +1,13 @@
 ﻿namespace TallyDB.Core.ByteConverters
 {
-  public class FloatConverter : IByteConverter<double>, IFixedLengthConverter
+  public class FloatConverter : IByteConverter<float>
   {
-    public double Decode(byte[] bytes)
+    public float Decode(byte[] bytes)
     {
-      return BitConverter.ToDouble(bytes);
+      return BitConverter.ToSingle(bytes);
     }
 
-    public byte[] Encode(double value)
+    public byte[] Encode(float value)
     {
       return BitConverter.GetBytes(value);
     }
