@@ -5,7 +5,7 @@ namespace TallyDB.Tests.Core.Timing
   [TestClass]
   public class KeyTimerTests
   {
-    [TestMethod]
+    [TestMethod("Should work with 24 hours period")]
     public void KeyTimer_24HourCase()
     {
       var kt = new KeyTimer(new SliceDefinition("EXAMPLE", new Axis[] { }, 24));
@@ -14,7 +14,7 @@ namespace TallyDB.Tests.Core.Timing
       Assert.AreEqual(expected.ToString(), start.ToString());
     }
 
-    [TestMethod]
+    [TestMethod("Should work with 30 minutes period")]
     public void KeyTimer_30MinutesCase()
     {
       var kt = new KeyTimer(new SliceDefinition("EXAMPLE", new Axis[] { }, 0.5d));

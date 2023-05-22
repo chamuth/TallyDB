@@ -1,0 +1,3 @@
+﻿**TODO**
+
+- Querying ranges

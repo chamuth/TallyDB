@@ -9,5 +9,7 @@ namespace TallyDB.Core
   public static class Constants
   {
     public const string TallyExtension = "tally";
+
+    public const int DefaultCacheExtensionCount = 100;
   }
 }

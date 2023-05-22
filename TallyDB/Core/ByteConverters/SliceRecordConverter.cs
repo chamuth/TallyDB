@@ -1,8 +1,6 @@
-﻿using TallyDB.Core.ByteConverters.Util;
-
-namespace TallyDB.Core.ByteConverters
+﻿namespace TallyDB.Core.ByteConverters
 {
-    public class SliceRecordConverter : IByteConverter<SliceRecord>
+  public class SliceRecordConverter : IByteConverter<SliceRecord>
   {
     private SliceDefinition _definition;
 
@@ -24,6 +22,8 @@ namespace TallyDB.Core.ByteConverters
       foreach (var axis in _definition.Axes)
       {
         string stringValue = "";
+        int? runnerValue = null;
+
         switch (axis.Type)
         {
           case DataType.TEXT:
@@ -33,19 +33,26 @@ namespace TallyDB.Core.ByteConverters
             stringValue = bytes.DecodeByteSlice(ref skip, ByteConverter.GetForType<int>()).ToString();
             if (axis.Function == AggregateFunction.AVG)
             {
-              skip += ByteConverter.GetForType<int>().GetFixedLength();
+              runnerValue = bytes.DecodeByteSlice(ref skip, ByteConverter.GetForType<int>());
             }
             break;
           case DataType.FLOAT:
             stringValue = bytes.DecodeByteSlice(ref skip, new FloatConverter()).ToString();
             if (axis.Function == AggregateFunction.AVG)
             {
-              skip += ByteConverter.GetForType<int>().GetFixedLength();
+              runnerValue = bytes.DecodeByteSlice(ref skip, ByteConverter.GetForType<int>());
             }
             break;
         }
 
-        records.Add(new SliceRecordData(axis.Type, stringValue));
+        var sliceRecord = new SliceRecordData(axis.Type, stringValue);
+        
+        if (runnerValue != null)
+        {
+          sliceRecord.RunnerValue = (int)runnerValue;
+        }
+
+        records.Add(sliceRecord);
       }
 
       return new SliceRecord(records.ToArray(), time);
@@ -76,7 +83,7 @@ namespace TallyDB.Core.ByteConverters
 
           if (axis.Function == AggregateFunction.AVG)
           {
-            values.AddRange(ByteConverter.GetForType<int>().Encode(1));
+            values.AddRange(ByteConverter.GetForType<int>().Encode(datum.RunnerValue));
           }
         }
         else if (datum.Type == DataType.INT)
@@ -86,7 +93,7 @@ namespace TallyDB.Core.ByteConverters
 
           if (axis.Function == AggregateFunction.AVG)
           {
-            values.AddRange(ByteConverter.GetForType<int>().Encode(1));
+            values.AddRange(ByteConverter.GetForType<int>().Encode(datum.RunnerValue));
           }
         }
       }
@@ -101,11 +108,15 @@ namespace TallyDB.Core.ByteConverters
         return 0;
       }
 
-      return new DateTimeConverter().GetFixedLength() + _definition.Axes.Select((x) =>
+      var count = ByteConverter.GetForType<DateTime>().GetFixedLength();
+
+      foreach (var axis in _definition.Axes)
       {
-        var type = ByteConverter.TypeForDataType(x.Type);
-        return ByteConverter.GetForType(type).GetFixedLength();
-      }).Sum();
+        var type = ByteConverter.TypeForDataType(axis.Type);
+        count += ByteConverter.GetFixedLengthForType(axis.Type);
+      }
+
+      return count;
     }
   }
 }

@@ -11,13 +11,13 @@ namespace TallyDB
 
       var creator = new SliceCreator(db);
       var slice = creator.Create(new SliceDefinition(
-        "response", new Axis[] { new Axis("time", DataType.FLOAT, AggregateFunction.AVG) }, 1 / 60
+        "response", new Axis[] { new Axis("time", DataType.FLOAT, AggregateFunction.AVG) }, 1
       ));
 
-      //slice.Report(new SliceRecord(new SliceRecordData[]
-      //{
-      //  new SliceRecordData(DataType.INT, "23")
-      //}));
+      slice.Insert(new SliceRecordData[]
+      {
+        new SliceRecordData(DataType.FLOAT, "25.25")
+      });
     }
   }
 }
