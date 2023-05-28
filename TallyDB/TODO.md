@@ -1,4 +1,4 @@
 ﻿**TODO**
 
-[ ] Querying ranges
-[ ] Mock Tests Implemented on SliceStorage
+[X] Querying ranges
+[X] Mock Tests Implemented on SliceStorage

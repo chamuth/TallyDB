@@ -53,7 +53,7 @@ namespace TallyDB.Mock.Slice
       ));
 
       // Add slice data
-      var sliceCount = random.Next(100, 500);
+      var sliceCount = random.Next(100, 200);
       records = GetSliceRecordData(sliceCount, def, startPeriod);
 
       // Encode

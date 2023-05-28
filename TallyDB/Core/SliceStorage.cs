@@ -9,7 +9,7 @@ namespace TallyDB.Core
   /// <summary>
   /// Act as a proxy between Slice and Disk Storage
   /// </summary>
-  public class SliceStorage
+  public class SliceStorage: IDisposable
   {
     FileStream _stream;
     BinaryReader _reader;
@@ -29,13 +29,6 @@ namespace TallyDB.Core
 
     SliceRecord? firstRecord;
     SliceRecord? lastRecord;
-
-    ~SliceStorage()
-    {
-      _reader.Close();
-      _writer.Close();
-      _stream.Dispose();
-    }
 
     public SliceStorage(string filename)
     {
@@ -117,6 +110,7 @@ namespace TallyDB.Core
     /// <returns>Slice record array of count from end</returns>
     private SliceRecord[] ReadRecordArrayByIndexFromDisk(int countFromLast, int offset = 0)
     {
+      Console.WriteLine("Reading {0} records starting from {1}", countFromLast, offset);
       var result = new SliceRecord[] { };
 
       if (_converter == null || _definition == null)
@@ -177,21 +171,34 @@ namespace TallyDB.Core
         return result;
       }
 
-      if (cachedData.First().Time <= startPeriod)
+      Console.WriteLine("Cached first time: {0}, start period: {1}", cachedData.First().Time, startPeriod);
+      //if (cachedData.First().Time <= startPeriod)
+      //{
+      //  // Required range overlaps cached range
+      //  result = cachedData
+      //    .Where((record) => record.Time >= startPeriod && record.Time <= endPeriod)
+      //    .OrderBy(x => x.Time)
+      //    .ToArray();
+      //}
+      //else
+      //{
+      //  Console.WriteLine("Not within cached range, refetching cache");
+      //  // Increase cache size and retry
+      //  IncreaseCacheSize();
+      //  //result = GetWithinRange(startPeriod, endPeriod);
+      //}
+
+      while (cachedData.First().Time > startPeriod)
       {
-        // Required range overlaps cached range
-        result = cachedData
-          .Where((record) => record.Time >= startPeriod && record.Time <= endPeriod)
-          .OrderBy(x => x.Time)
-          .ToArray();
-      }
-      else
-      {
-        // Increase cache size and retry
+        Console.WriteLine("cached first: {2}, cached ordered First: {0}, startPeriod: {1}", cachedData.OrderBy(x => x.Time).First().Time, startPeriod, cachedData.First().Time);
         IncreaseCacheSize();
-        result = GetWithinRange(startPeriod, endPeriod);
       }
-      
+
+      result = cachedData
+        .Where((record) => record.Time >= startPeriod && record.Time <= endPeriod)
+        .OrderBy(x => x.Time)
+        .ToArray();
+
       return result;
     }
 
@@ -202,6 +209,11 @@ namespace TallyDB.Core
     {
       int previous = cachedCount;
       cachedCount += cachedCount;
+
+      // Clamp cache size
+      cachedCount = Math.Clamp(cachedCount, 0, GetSliceRecordCountInDisk());
+
+      Console.WriteLine("Increasing cache count to: {0}", cachedCount);
 
       // Read only increased count skipping already loaded ones
       FetchCacheRecords(previous);
@@ -218,7 +230,10 @@ namespace TallyDB.Core
         return;
       }
 
-      cachedData = new List<SliceRecord>(ReadRecordArrayByIndexFromDisk(cachedCount, skip));
+      var toReadCount = cachedCount - skip;
+
+      Console.WriteLine("Fetching records to cache. current cache size: {0}, reading: {1}, Skip: {2}", cachedData.Count, toReadCount, skip);
+      cachedData.InsertRange(0, ReadRecordArrayByIndexFromDisk(toReadCount, skip));
     }
 
     /// <summary>
@@ -237,18 +252,19 @@ namespace TallyDB.Core
         return result.ToArray();
       }
 
-      while(from == to)
+      while(from <= to)
       {
-        var record = dataset.Where(r => r.Time == from);
+        var record = dataset.FirstOrDefault(r => r.Time == from);
+        from = from.AddHours(_definition.Frequency);
 
-        if (record.Count() == 0) {
+        if (record == null) {
           // Add default slice record
           result.Add(new SliceRecord(new SliceRecordData[] { }, from));
           continue;
         }
 
         // Insert found record
-        result.Add(record.First());
+        result.Add(record);
       }
 
       return result.ToArray();
@@ -386,6 +402,13 @@ namespace TallyDB.Core
       _stream.Seek(0, SeekOrigin.End);
       _writer.Write(buffer);
       _writer.Flush();
+    }
+
+    public void Dispose()
+    {
+      _reader.Close();
+      _writer.Close();
+      _stream.Dispose();
     }
 
     /// <summary>
