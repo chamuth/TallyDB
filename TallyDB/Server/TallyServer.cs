@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace TallyDB.Server
 {
@@ -26,18 +28,22 @@ namespace TallyDB.Server
 
         var childSocketThread = new Thread(() =>
         {
-          byte[] data = new byte[100];
-          int size = client.Receive(data);
-          Console.WriteLine("Recieved data: ");
-
-          for (int i = 0; i < size; i++)
+          while (true)
           {
-            Console.Write(Convert.ToChar(data[i]));
+            byte[] data = new byte[100];
+            int size = client.Receive(data);
+
+            string value = "";
+
+            for (int i = 0; i < size; i++)
+            {
+              value += (Convert.ToChar(data[i]));
+            }
+
+            Console.WriteLine("Receiving request: {0}", value);
+            client.Send(Encoding.UTF8.GetBytes(value));
+            Console.WriteLine("Sending response: {0}", value);
           }
-
-          Console.WriteLine();
-
-          client.Close();
         });
 
         childSocketThread.Start();

@@ -82,7 +82,7 @@ namespace TallyDB.Tests.Core.SliceRecords
       storage.Dispose();
     }
 
-    [TestMethod("Should have large datasets")]
+    [TestMethod("Should have large datasets (10 thousand records)")]
     public void ShouldHandleLargeDatasets()
     {
       var mocker = new MockSliceCreator(28);
@@ -102,7 +102,7 @@ namespace TallyDB.Tests.Core.SliceRecords
       storage.Dispose();
     }
 
-    [TestMethod("Should have very large datasets")]
+    [TestMethod("Should have very large datasets (100 thousand records)")]
     public void ShouldHandleVeryLargeDatasets()
     {
       var mocker = new MockSliceCreator(28);
@@ -122,7 +122,7 @@ namespace TallyDB.Tests.Core.SliceRecords
       storage.Dispose();
     }
 
-    [TestMethod("Should have ultra large datasets")]
+    [TestMethod("Should have ultra large datasets (1 million records)")]
     public void ShouldHandleUltraLargeDatasets()
     {
       var mocker = new MockSliceCreator(28);
