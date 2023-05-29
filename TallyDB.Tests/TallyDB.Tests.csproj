@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TallyDB.Mock\TallyDB.Mock.csproj" />
     <ProjectReference Include="..\TallyDB\TallyDB.csproj" />
   </ItemGroup>
 
