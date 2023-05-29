@@ -81,5 +81,65 @@ namespace TallyDB.Tests.Core.SliceRecords
 
       storage.Dispose();
     }
+
+    [TestMethod("Should have large datasets")]
+    public void ShouldHandleLargeDatasets()
+    {
+      var mocker = new MockSliceCreator(28);
+      SliceDefinition def;
+      SliceRecord[] records;
+      mocker.Create(sliceName, out def, out records, 10000);
+
+      var storage = new SliceStorage(filename);
+      storage.LoadSliceDefinition();
+
+      var first = records.First().Time;
+      var last = records.Last().Time;
+
+      Assert.AreEqual(first, storage.First()?.Time);
+      Assert.AreEqual(last, storage.Last()?.Time);
+
+      storage.Dispose();
+    }
+
+    [TestMethod("Should have very large datasets")]
+    public void ShouldHandleVeryLargeDatasets()
+    {
+      var mocker = new MockSliceCreator(28);
+      SliceDefinition def;
+      SliceRecord[] records;
+      mocker.Create(sliceName, out def, out records, 100000);
+
+      var storage = new SliceStorage(filename);
+      storage.LoadSliceDefinition();
+
+      var first = records.First().Time;
+      var last = records.Last().Time;
+
+      Assert.AreEqual(first, storage.First()?.Time);
+      Assert.AreEqual(last, storage.Last()?.Time);
+
+      storage.Dispose();
+    }
+
+    [TestMethod("Should have ultra large datasets")]
+    public void ShouldHandleUltraLargeDatasets()
+    {
+      var mocker = new MockSliceCreator(28);
+      SliceDefinition def;
+      SliceRecord[] records;
+      mocker.Create(sliceName, out def, out records, 1000000);
+
+      var storage = new SliceStorage(filename);
+      storage.LoadSliceDefinition();
+
+      var first = records.First().Time;
+      var last = records.Last().Time;
+
+      Assert.AreEqual(first, storage.First()?.Time);
+      Assert.AreEqual(last, storage.Last()?.Time);
+
+      storage.Dispose();
+    }
   }
 }
