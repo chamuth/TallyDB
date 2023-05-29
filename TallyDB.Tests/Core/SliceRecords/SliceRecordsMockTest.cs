@@ -23,7 +23,7 @@ namespace TallyDB.Tests.Core.SliceRecords
     public void ShouldCreateSlice()
     {
       // Create new mocked slice
-      var mocker = new MockSliceCreator();
+      var mocker = new MockSliceCreator(25);
       SliceDefinition def;
       SliceRecord[] records;
       mocker.Create(sliceName, out def, out records);
@@ -44,7 +44,7 @@ namespace TallyDB.Tests.Core.SliceRecords
     [TestMethod("Should query ranges in slice")]
     public void ShouldQueryRangesInSlice()
     {
-      var mocker = new MockSliceCreator();
+      var mocker = new MockSliceCreator(26);
       SliceDefinition def;
       SliceRecord[] records;
       mocker.Create(sliceName, out def, out records);
@@ -65,7 +65,7 @@ namespace TallyDB.Tests.Core.SliceRecords
     [TestMethod("Should have correct first and last record times")]
     public void ShouldHaveCorrectFirstLastTimes()
     {
-      var mocker = new MockSliceCreator();
+      var mocker = new MockSliceCreator(28);
       SliceDefinition def;
       SliceRecord[] records;
       mocker.Create(sliceName, out def, out records);
