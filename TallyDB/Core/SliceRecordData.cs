@@ -1,15 +1,19 @@
-﻿namespace TallyDB.Core
+﻿using Newtonsoft.Json;
+
+namespace TallyDB.Core
 {
   public class SliceRecordData
   {
     /// <summary>
     /// DataType of the slice record data
     /// </summary>
+    [JsonProperty("type")]
     public DataType Type { get; set; }
 
     /// <summary>
     /// String value of the underlying value
     /// </summary>
+    [JsonProperty("value")]
     public string StringValue { get; set; }
 
     /// <summary>

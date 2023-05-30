@@ -2,10 +2,12 @@
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using System.Text;
+using TallyDB.Server.Types;
+using TallyDB.Server.QueryProcessor;
 
 namespace TallyDB.Server
 {
-  public class TallyServer
+    public class TallyServer
   {
     int port = 4053;
     IPAddress localAddr = IPAddress.Parse("127.0.0.1");
@@ -28,6 +30,8 @@ namespace TallyDB.Server
 
         var childSocketThread = new Thread(() =>
         {
+          var requestProcessor = new RequestProcessor();
+
           while (true)
           {
             byte[] data = new byte[100];
@@ -40,9 +44,15 @@ namespace TallyDB.Server
               value += (Convert.ToChar(data[i]));
             }
 
-            Console.WriteLine("Receiving request: {0}", value);
-            client.Send(Encoding.UTF8.GetBytes(value));
-            Console.WriteLine("Sending response: {0}", value);
+            var request = JsonConvert.DeserializeObject<QueryRequest>(value);
+
+            if (request != null)
+            {
+              Console.WriteLine("Request received: {0}", value);
+              var response = requestProcessor.Process(request);
+              client.Send(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+              Console.WriteLine("Sending response: {0}", JsonConvert.SerializeObject(response));
+            }
           }
         });
 
