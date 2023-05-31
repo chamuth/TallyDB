@@ -8,15 +8,15 @@ namespace TallyDB.Server.Types
     [JsonProperty("requestId")]
     public string RequestId { get; set; }
     [JsonProperty("sliceName")]
-    public string SliceName { get; set; }
+    public string? SliceName { get; set; }
     [JsonProperty("records")]
-    public SliceRecord[] Records { get; set; }
+    public SliceRecord[]? Records { get; set; }
+    [JsonProperty("errors")]
+    public DatabaseError[]? Errors { get; set; }
 
-    public QueryResponse(string requestId, string sliceName, SliceRecord[] records)
+    public QueryResponse(string requestId)
     {
       RequestId = requestId;
-      SliceName = sliceName;
-      Records = records;
     }
   }
 }

@@ -9,13 +9,13 @@ namespace TallyDB.Server.Types
     [JsonProperty("message")]
     public string Message { get; set; }
     [JsonProperty("description")]
-    public string Descriptoin { get; set; }
+    public string Description { get; set; }
 
     public DatabaseError(string errorCode, string message, string descriptoin)
     {
       ErrorCode = errorCode;
       Message = message;
-      Descriptoin = descriptoin;
+      Description = descriptoin;
     }
   }
 }
