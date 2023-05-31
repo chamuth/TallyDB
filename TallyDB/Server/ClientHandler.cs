@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Text;
+using TallyDB.Config;
+using TallyDB.Config.Auth;
 using TallyDB.Server.QueryProcessor;
 using TallyDB.Server.Types;
 
@@ -14,6 +16,7 @@ namespace TallyDB.Server
     /// <param name="client">client socket connection</param>
     public static void Handle(Socket client)
     {
+      var authStorage = new AuthStorage(new FileOperator());
       var requestProcessor = new RequestProcessor();
 
       while (true)
