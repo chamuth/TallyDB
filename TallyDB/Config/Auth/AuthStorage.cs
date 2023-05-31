@@ -16,8 +16,15 @@
     {
       // Check if user exists
       var users = GetAll();
-      var user = users.First(user => user.Username == username);
 
+      // if no users available create default user on server
+      if (users.Length == 0)
+      {
+        CreateDefaultUser();
+        users = GetAll();
+      }
+
+      var user = users.FirstOrDefault(user => user.Username == username);
       if (user == null)
       {
         return null;
@@ -29,13 +36,21 @@
       if (verify)
       {
         // Update user's last logged in time
-        user.LastLoggedIn = new DateTime();
+        user.LastLoggedIn = DateTime.Now;
         Save(user, (u) => u.Username == user.Username);
 
         return user;
       }
 
       return null;
+    }
+
+    /// <summary>
+    /// Create the default user first time
+    /// </summary>
+    private void CreateDefaultUser()
+    {
+      CreateUser("username", "password", new string[] { });
     }
 
     /// <summary>

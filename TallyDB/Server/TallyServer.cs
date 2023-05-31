@@ -23,7 +23,7 @@ namespace TallyDB.Server
       while (true)
       {
         Socket client = listener.AcceptSocket();
-        Task.Run(() => ClientHandler.Handle(client));
+        Task.Run(() => new ClientHandler().Handle(client));
       }
     }
   }

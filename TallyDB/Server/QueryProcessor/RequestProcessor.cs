@@ -8,7 +8,7 @@ namespace TallyDB.Server.QueryProcessor
 
     public QueryResponse Process(QueryRequest request)
     {
-      return new QueryResponse(request.RequestId, "SLICE2", new Core.SliceRecord[] { });
+      return new QueryResponse(request.RequestId);
     }
   }
 }

@@ -7,7 +7,9 @@ namespace TallyDB.Server.Types
     [JsonProperty("requestId")]
     public string RequestId { get; set; }
     [JsonProperty("query")]
-    public Query Query { get; set; }
+    public Query? Query { get; set; }
+    [JsonProperty("credentials")]
+    public Credentials? Credentials { get; set; }
 
     public QueryRequest(string requestId, Query query)
     {
