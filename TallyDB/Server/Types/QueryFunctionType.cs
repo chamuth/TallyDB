@@ -2,6 +2,8 @@
 {
   public static class QueryFunctionType
   {
-    public const string Handshake = "Handshake";
+    public const string Create = "CREATE";
+    public const string Query = "QUERY";
+    public const string Delete = "DELETE";
   }
 }
