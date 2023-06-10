@@ -1,12 +1,25 @@
-﻿using TallyDB.Server.Types;
+﻿using System.Drawing;
+using TallyDB.Core;
+using TallyDB.Server.Errors;
+using TallyDB.Server.Types;
 
 namespace TallyDB.Server.QueryProcessor.Strategies
 {
+  /// <summary>
+  /// Strategy to create a new database
+  /// </summary>
   public class CreateDatabase : IProcessingStrategy
   {
     public QueryResponse Process(QueryRequest query)
     {
-      throw new NotImplementedException();
+      var name = query.Query?.Database?.Name;
+      if (name == null)
+      {
+        throw DatabaseErrors.InvalidQueryInputError;
+      }
+
+      new Database(name).Create();
+      return new QueryResponse(query.RequestId);
     }
   }
 }

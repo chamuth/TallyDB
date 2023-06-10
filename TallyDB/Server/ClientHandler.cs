@@ -8,7 +8,7 @@ using TallyDB.Server.Types;
 
 namespace TallyDB.Server
 {
-  public class ClientHandler
+    public class ClientHandler
   {
     /// <summary>
     /// Handle each client being connected to the server

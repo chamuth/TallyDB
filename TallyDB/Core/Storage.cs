@@ -33,9 +33,9 @@ namespace TallyDB.Core
       fs.Close();
     }
 
-    public static void GetDirectoriesInDirectory()
+    public static string[] GetDirectoriesInDirectory()
     {
-      Directory.GetDirectories(Join(""));
+      return Directory.GetDirectories(Join(""));
     }
     
     public static string[] GetFilesInDirectory(string name)

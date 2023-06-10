@@ -1,16 +1,13 @@
-﻿using System.Text;
-using TallyDB.Core.Aggregation;
-using TallyDB.Core.ByteConverters;
-using TallyDB.Core.Timing;
-
-namespace TallyDB.Core
+﻿namespace TallyDB.Core
 {
   public class Slice
   {
     SliceStorage storage;
+    public string Name { get; }
 
     public Slice(string filename)
     {
+      Name = Path.GetFileNameWithoutExtension(filename);
       storage = new SliceStorage(filename);
     }
 

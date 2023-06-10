@@ -56,7 +56,20 @@ namespace TallyDB.Server.QueryProcessor
         }
       }
 
-      return strategy.Process(request);
+      try
+      {
+        return strategy.Process(request);
+      }
+      catch (DatabaseError error)
+      {
+        return new QueryResponse(request.RequestId)
+        {
+          Errors = new DatabaseError[]
+          {
+            error
+          }
+        };
+      }
     }
   }
 }

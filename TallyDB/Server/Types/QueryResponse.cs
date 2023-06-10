@@ -3,7 +3,7 @@ using TallyDB.Core;
 
 namespace TallyDB.Server.Types
 {
-  public class QueryResponse
+    public class QueryResponse
   {
     [JsonProperty("requestId")]
     public string RequestId { get; set; }
