@@ -48,6 +48,11 @@ namespace TallyDB.Core
       }
     }
 
+    /// <summary>
+    /// Get slice by name
+    /// </summary>
+    /// <param name="name">Slice name</param>
+    /// <returns>Slice instance</returns>
     public Slice GetSlice(string name)
     {
       var slice = _slices.FirstOrDefault(sl => sl.Name == name);

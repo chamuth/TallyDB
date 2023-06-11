@@ -14,6 +14,6 @@ namespace TallyDB.Server.Types
     [JsonProperty("frequency")]
     public double? Frequency { get; set; }
     [JsonProperty("records")]
-    public SliceRecord[]? Records { get; set; }
+    public SliceRecordData[]? Records { get; set; }
   }
 }

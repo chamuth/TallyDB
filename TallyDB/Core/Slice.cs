@@ -34,9 +34,9 @@
     /// <param name="start">Start of the render period</param>
     /// <param name="end">End of the render period</param>
     /// <param name="resolution">Minimum resolution as a multiply of period time of the slice. If period time of the slice is 1 hour and resolution is set as 2, the length between two points in results is 2 hours.</param>
-    public void Query(DateTime start, DateTime end, float resolution)
+    public SliceRecord[] Query(DateTime start, DateTime end, float resolution)
     {
-
+      return storage[start, end];
     }
 
     public void Insert(SliceRecordData[] data)

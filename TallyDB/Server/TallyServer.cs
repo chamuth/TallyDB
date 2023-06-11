@@ -22,9 +22,13 @@ namespace TallyDB.Server
       TcpListener listener = new TcpListener(localAddr, port);
       listener.Start();
 
+      Console.WriteLine("Started TallyDB server at {0} 🚀", port);
+
       while (true)
       {
+        Console.WriteLine("Waiting for socket connection");
         Socket client = listener.AcceptSocket();
+        Console.WriteLine("ACCEPTED SOCKET CONNECTION");
         Task.Run(() => new ClientHandler().Handle(client));
       }
     }
