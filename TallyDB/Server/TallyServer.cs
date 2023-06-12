@@ -19,7 +19,8 @@ namespace TallyDB.Server
     {
       DatabaseManager.LoadDatabases();
 
-      TcpListener listener = new TcpListener(localAddr, port);
+      IPEndPoint ep = new IPEndPoint(IPAddress.Any, port);
+      TcpListener listener = new TcpListener(ep);
       listener.Start();
 
       Console.WriteLine("Started TallyDB server at {0} 🚀", port);
