@@ -24,7 +24,7 @@ namespace TallyDB.Server
       while (true)
       {
         byte[] data = new byte[2048];
-        int size = 0;
+        int size;
         try
         {
           size = client.Receive(data);

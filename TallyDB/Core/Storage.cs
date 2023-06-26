@@ -27,6 +27,12 @@ namespace TallyDB.Core
       Console.WriteLine("Created Directory: {0}", directory);
     }
 
+    public static void DeleteDirectory(string name)
+    {
+      var directory = Join(name);
+      Directory.Delete(directory, true);
+    }
+
     public static void CreateFile(string name)
     {
       var fs = File.Create(Join(name).AppendExtension());

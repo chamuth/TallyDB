@@ -18,7 +18,8 @@ namespace TallyDB.Server.QueryProcessor.Strategies
         throw DatabaseErrors.InvalidQueryInputError;
       }
 
-      new Database(name).Create();
+      DatabaseManager.CreateDatabase(name);
+
       return new QueryResponse(query.RequestId);
     }
   }

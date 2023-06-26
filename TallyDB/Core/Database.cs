@@ -64,5 +64,22 @@ namespace TallyDB.Core
 
       return slice;
     }
+
+    /// <summary>
+    /// Get all loaded slices
+    /// </summary>
+    /// <returns>All slices</returns>
+    public Slice[] GetAllSlices()
+    {
+      return _slices.ToArray();
+    }
+
+    /// <summary>
+    /// Delete database self
+    /// </summary>
+    public void DeleteSelf()
+    {
+      Storage.DeleteDirectory(Name);
+    }
   }
 }

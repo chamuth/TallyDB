@@ -44,6 +44,17 @@ namespace TallyDB.Server.QueryProcessor
           strategy = new QueryDatabase();
         }
       }
+      else if (function == QueryFunctionType.List)
+      {
+        if (query.Database != null)
+        {
+          strategy = new ListSlices();
+        }
+        else
+        {
+          strategy = new ListDatabases();
+        }
+      }
       else if (function == QueryFunctionType.Delete)
       {
         if (query.Database != null)
