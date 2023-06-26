@@ -1,4 +1,5 @@
 ﻿using TallyDB.Core.Exceptions;
+using TallyDB.Server.Errors;
 
 namespace TallyDB.Core
 {
@@ -27,7 +28,7 @@ namespace TallyDB.Core
       }
       catch (Exception)
       {
-        throw new DatabaseCreateFailedException();
+        throw DatabaseErrors.DatabaseCreationFailedError;
       }
     }
 
@@ -47,13 +48,38 @@ namespace TallyDB.Core
       }
     }
 
+    /// <summary>
+    /// Get slice by name
+    /// </summary>
+    /// <param name="name">Slice name</param>
+    /// <returns>Slice instance</returns>
+    public Slice GetSlice(string name)
+    {
+      var slice = _slices.FirstOrDefault(sl => sl.Name == name);
+
+      if (slice == null)
+      {
+        throw DatabaseErrors.SliceNotFoundError;
+      }
+
+      return slice;
+    }
 
     /// <summary>
-    /// Query the database
+    /// Get all loaded slices
     /// </summary>
-    public void Query()
+    /// <returns>All slices</returns>
+    public Slice[] GetAllSlices()
     {
+      return _slices.ToArray();
+    }
 
+    /// <summary>
+    /// Delete database self
+    /// </summary>
+    public void DeleteSelf()
+    {
+      Storage.DeleteDirectory(Name);
     }
   }
 }

@@ -2,7 +2,7 @@
 
 namespace TallyDB.Server.QueryProcessor.Strategies
 {
-  public class UnknownQueryType : IProcessingStrategy
+    public class UnknownQueryType : IProcessingStrategy
   {
     public QueryResponse Process(QueryRequest request)
     {

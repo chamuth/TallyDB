@@ -1,4 +1,6 @@
-﻿namespace TallyDB.Config.Auth
+﻿using Constants = TallyDB.Core.Constants;
+
+namespace TallyDB.Config.Auth
 {
   public class AuthStorage : ConfigStorage<User>
   {
@@ -50,7 +52,7 @@
     /// </summary>
     private void CreateDefaultUser()
     {
-      CreateUser("username", "password", new string[] { });
+      CreateUser(Constants.DefaultUsername, Constants.DefaultPassword, new string[] { });
     }
 
     /// <summary>

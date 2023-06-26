@@ -33,7 +33,7 @@ namespace TallyDB.Core
     public SliceStorage(string filename)
     {
       // Initialize IO readers and writers
-      _stream = new FileStream(string.Format("{0}.{1}", filename, Constants.TallyExtension), FileMode.Open);
+      _stream = new FileStream(filename, FileMode.Open);
       _reader = new BinaryReader(_stream, Encoding.UTF8);
       _writer = new BinaryWriter(_stream, Encoding.UTF8);
     }

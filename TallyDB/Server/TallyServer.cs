@@ -17,12 +17,19 @@ namespace TallyDB.Server
 
     public void StartServer()
     {
-      TcpListener listener = new TcpListener(localAddr, port);
+      DatabaseManager.LoadDatabases();
+
+      IPEndPoint ep = new IPEndPoint(IPAddress.Any, port);
+      TcpListener listener = new TcpListener(ep);
       listener.Start();
+
+      Console.WriteLine("Started TallyDB server at {0} 🚀", port);
 
       while (true)
       {
+        Console.WriteLine("Waiting for socket connection");
         Socket client = listener.AcceptSocket();
+        Console.WriteLine("ACCEPTED SOCKET CONNECTION");
         Task.Run(() => new ClientHandler().Handle(client));
       }
     }

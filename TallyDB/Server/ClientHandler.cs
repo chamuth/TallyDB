@@ -24,7 +24,16 @@ namespace TallyDB.Server
       while (true)
       {
         byte[] data = new byte[2048];
-        int size = client.Receive(data);
+        int size;
+        try
+        {
+          size = client.Receive(data);
+        }
+        catch (Exception)
+        {
+          Console.Error.WriteLine("Client connection closed");
+          break;
+        }
 
         string value = "";
 
@@ -41,6 +50,7 @@ namespace TallyDB.Server
           {
             // Handle authentication
             var creds = request.Credentials;
+            Console.WriteLine("Receiving credentials");
             authUser = authStorage.Authenticate(creds.Username, creds.Password);
 
             if (authUser == null)

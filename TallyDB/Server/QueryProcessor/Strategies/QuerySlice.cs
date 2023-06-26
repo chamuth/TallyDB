@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TallyDB.Server.Types;
+﻿using TallyDB.Server.Types;
 
 namespace TallyDB.Server.QueryProcessor.Strategies
 {
@@ -11,7 +6,20 @@ namespace TallyDB.Server.QueryProcessor.Strategies
   {
     public QueryResponse Process(QueryRequest query)
     {
-      throw new NotImplementedException();
+      var slice = query.Query?.Slice;
+      var range = query.Query?.Range;
+
+      var from = range?.from ?? DateTime.Now;
+      var to = range?.to ?? DateTime.Now;
+
+      // Find slice and read data
+      var records = DatabaseManager.GetDatabase(slice?.Database ?? "").GetSlice(slice?.Name ?? "")
+        .Query(from, to, 1);
+
+      return new QueryResponse(query.RequestId)
+      {
+        Records = records
+      };
     }
   }
 }
