@@ -1,16 +1,13 @@
-﻿using System.Text;
-using TallyDB.Core.Aggregation;
-using TallyDB.Core.ByteConverters;
-using TallyDB.Core.Timing;
-
-namespace TallyDB.Core
+﻿namespace TallyDB.Core
 {
   public class Slice
   {
     SliceStorage storage;
+    public string Name { get; }
 
     public Slice(string filename)
     {
+      Name = Path.GetFileNameWithoutExtension(filename);
       storage = new SliceStorage(filename);
     }
 
@@ -37,9 +34,9 @@ namespace TallyDB.Core
     /// <param name="start">Start of the render period</param>
     /// <param name="end">End of the render period</param>
     /// <param name="resolution">Minimum resolution as a multiply of period time of the slice. If period time of the slice is 1 hour and resolution is set as 2, the length between two points in results is 2 hours.</param>
-    public void Query(DateTime start, DateTime end, float resolution)
+    public SliceRecord[] Query(DateTime start, DateTime end, float resolution)
     {
-
+      return storage[start, end];
     }
 
     public void Insert(SliceRecordData[] data)

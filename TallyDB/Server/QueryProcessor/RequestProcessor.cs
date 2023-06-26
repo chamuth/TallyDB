@@ -44,6 +44,17 @@ namespace TallyDB.Server.QueryProcessor
           strategy = new QueryDatabase();
         }
       }
+      else if (function == QueryFunctionType.List)
+      {
+        if (query.Database != null)
+        {
+          strategy = new ListSlices();
+        }
+        else
+        {
+          strategy = new ListDatabases();
+        }
+      }
       else if (function == QueryFunctionType.Delete)
       {
         if (query.Database != null)
@@ -56,7 +67,20 @@ namespace TallyDB.Server.QueryProcessor
         }
       }
 
-      return strategy.Process(request);
+      try
+      {
+        return strategy.Process(request);
+      }
+      catch (DatabaseError error)
+      {
+        return new QueryResponse(request.RequestId)
+        {
+          Errors = new DatabaseError[]
+          {
+            error
+          }
+        };
+      }
     }
   }
 }

@@ -9,7 +9,7 @@ namespace TallyDB.Server.Types
   public class Query
   {
     [JsonProperty("function")]
-    public string Function { get; set; }
+    public string? Function { get; set; }
 
     [JsonProperty("slice")]
     public SliceCreationData? Slice { get; set; }
@@ -20,7 +20,7 @@ namespace TallyDB.Server.Types
     [JsonProperty("users")]
     public UserCreationData? Users { get; set; }
 
-    public Query(string function)
+    public Query(string? function = null)
     {
       Function = function;
     }

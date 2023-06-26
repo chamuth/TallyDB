@@ -7,7 +7,7 @@ namespace TallyDB.Tests.Core.SliceRecords
   public class SliceRecordsMockTest
   {
     string sliceName = "mock1";
-    string filename = Storage.Join("mock\\mock1");
+    string filename = Storage.Join("mock\\mock1.tally");
 
     [TestInitialize]
     public void Prepare()
@@ -17,6 +17,12 @@ namespace TallyDB.Tests.Core.SliceRecords
       {
         File.Delete(filename);
       }
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+      Directory.Delete(Storage.Join("mock"), true);
     }
 
     [TestMethod("Should create slice")]

@@ -4,6 +4,7 @@
   {
     public const string Create = "CREATE";
     public const string Query = "QUERY";
+    public const string List = "LIST";
     public const string Delete = "DELETE";
   }
 }

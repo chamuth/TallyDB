@@ -2,20 +2,20 @@
 
 namespace TallyDB.Server.Types
 {
-  public class DatabaseError
-  {
-    [JsonProperty("errorCode")]
-    public string ErrorCode { get; set; }
-    [JsonProperty("message")]
-    public string Message { get; set; }
-    [JsonProperty("description")]
-    public string Description { get; set; }
-
-    public DatabaseError(string errorCode, string message, string descriptoin)
+    public class DatabaseError: Exception
     {
-      ErrorCode = errorCode;
-      Message = message;
-      Description = descriptoin;
+        [JsonProperty("errorCode")]
+        public string ErrorCode { get; set; }
+        [JsonProperty("message")]
+        public override string Message { get; }
+        [JsonProperty("description")]
+        public string? Description { get; set; }
+
+        public DatabaseError(string errorCode, string message, string? description = null)
+        {
+            ErrorCode = errorCode;
+            Message = message;
+            Description = description;
+        }
     }
-  }
 }
