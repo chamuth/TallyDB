@@ -23,24 +23,7 @@ namespace TallyDB.Server
       while (true)
       {
         Socket client = listener.AcceptSocket();
-
-        var childSocketThread = new Thread(() =>
-        {
-          byte[] data = new byte[100];
-          int size = client.Receive(data);
-          Console.WriteLine("Recieved data: ");
-
-          for (int i = 0; i < size; i++)
-          {
-            Console.Write(Convert.ToChar(data[i]));
-          }
-
-          Console.WriteLine();
-
-          client.Close();
-        });
-
-        childSocketThread.Start();
+        Task.Run(() => new ClientHandler().Handle(client));
       }
     }
   }

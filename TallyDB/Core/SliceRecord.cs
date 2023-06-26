@@ -1,8 +1,12 @@
-﻿namespace TallyDB.Core
+﻿using Newtonsoft.Json;
+
+namespace TallyDB.Core
 {
   public class SliceRecord
   {
+    [JsonProperty("time")]
     public DateTime Time { get; set; }
+    [JsonProperty("data")]
     public SliceRecordData[] Data { get; set; }
 
     public SliceRecord(SliceRecordData[] data, DateTime time)

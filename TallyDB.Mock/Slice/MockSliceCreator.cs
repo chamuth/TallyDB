@@ -40,7 +40,7 @@ namespace TallyDB.Mock.Slice
       return records.ToArray();
     }
 
-    public void Create(string name, out SliceDefinition def, out SliceRecord[] records)
+    public void Create(string name, out SliceDefinition def, out SliceRecord[] records, int? recordCount = null)
     {
       var axesCount = 2;
       var frequency = random.Next(2, 5) * 0.5f;
@@ -54,6 +54,10 @@ namespace TallyDB.Mock.Slice
 
       // Add slice data
       var sliceCount = random.Next(100, 200);
+      if (recordCount != null)
+      {
+        sliceCount = (int)recordCount;
+      }
       records = GetSliceRecordData(sliceCount, def, startPeriod);
 
       // Encode
