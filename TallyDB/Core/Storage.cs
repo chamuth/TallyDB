@@ -5,7 +5,7 @@ namespace TallyDB.Core
 {
   public static class Storage
   {
-    public static string RootDirectory = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), "TallyDB\\Source\\");
+    public static string RootDirectory = Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "TallyDB/Source/");
 
     static Storage()
     {
@@ -43,7 +43,7 @@ namespace TallyDB.Core
     {
       return Directory.GetDirectories(Join(""));
     }
-    
+
     public static string[] GetFilesInDirectory(string name)
     {
       return Directory.GetFiles(Join(name));

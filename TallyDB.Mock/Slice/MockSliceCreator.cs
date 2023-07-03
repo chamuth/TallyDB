@@ -26,7 +26,7 @@ namespace TallyDB.Mock.Slice
     {
       List<SliceRecord> records = new List<SliceRecord>();
 
-      for (var i = 0; i < count; i ++)
+      for (var i = 0; i < count; i++)
       {
         List<SliceRecordData> data = new List<SliceRecordData>();
         for (var j = 0; j < definition.Axes.Count(); j++)
@@ -67,8 +67,8 @@ namespace TallyDB.Mock.Slice
 
       var finalBytes = headerBytes.Concat(recordBytes).ToArray();
 
-      var file = Storage.Join(string.Format("mock\\{0}.tally", def.Name));
-      Storage.CreateDirectory(Storage.Join("mock\\"));
+      var file = Storage.Join(string.Format("mock/{0}.tally", def.Name));
+      Storage.CreateDirectory(Storage.Join("mock/"));
       File.WriteAllBytes(file, finalBytes);
     }
   }
