@@ -1,14 +1,12 @@
-﻿
-using static System.Environment;
-
-namespace TallyDB.Core
+﻿namespace TallyDB.Core
 {
   public static class Storage
   {
-    public static string RootDirectory = Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "TallyDB/Source/");
+    public static string RootDirectory = Path.Combine(Constants.TallyRoot, "Source/");
 
     static Storage()
     {
+      Console.WriteLine(RootDirectory);
       if (!Directory.Exists(RootDirectory))
       {
         Directory.CreateDirectory(RootDirectory);

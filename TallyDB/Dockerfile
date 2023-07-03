@@ -6,7 +6,7 @@ COPY . ./
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a debug release
-RUN dotnet publish -c Debug -o out
+RUN dotnet publish -c Debug -o out /p:DefineConstants=ENV_DOCKER
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0

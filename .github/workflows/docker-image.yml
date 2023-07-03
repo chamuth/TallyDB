@@ -38,7 +38,7 @@ jobs:
       - name: Build and push Docker image to ghcr
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
-          context: .
+          context: ./TallyDB/
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.ref_name }}
