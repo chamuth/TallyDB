@@ -1,6 +1,6 @@
 # TallyDB
 
-[![.NET](https://github.com/Chamuth/TallyDB/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/Chamuth/TallyDB/actions/workflows/dotnet.yml)
+[![.NET Unit Tests](https://github.com/Chamuth/TallyDB/actions/workflows/dotnet-test.yml/badge.svg)](https://github.com/Chamuth/TallyDB/actions/workflows/dotnet-test.yml)
 
 ## What is TallyDB?
 TallyDB is a powerful time-series database engine designed for storing and analyzing large-scale historical data. With TallyDB, you can easily manage and retrieve data while also aggregating it based on time resolutions.
