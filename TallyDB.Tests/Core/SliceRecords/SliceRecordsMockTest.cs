@@ -7,7 +7,7 @@ namespace TallyDB.Tests.Core.SliceRecords
   public class SliceRecordsMockTest
   {
     string sliceName = "mock1";
-    string filename = Storage.Join("mock\\mock1.tally");
+    string filename = Storage.Join("mock/mock1.tally");
 
     [TestInitialize]
     public void Prepare()

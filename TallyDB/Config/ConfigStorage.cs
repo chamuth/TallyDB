@@ -6,7 +6,7 @@ namespace TallyDB.Config
   public abstract class ConfigStorage<T>
   {
     public abstract string Path { get; set; }
-    public static string RootDirectory = System.IO.Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), "TallyDB\\Config\\");
+    public static string RootDirectory = System.IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "TallyDB/Config/");
 
     private IFileOperable file;
 
