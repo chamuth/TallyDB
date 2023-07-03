@@ -1,10 +1,14 @@
-﻿
+﻿using Newtonsoft.Json;
+
 namespace TallyDB.Core
 {
   public class SliceDefinition
   {
+    [JsonProperty("name")]
     public string Name { get; set; }
+    [JsonProperty("axes")]
     public Axis[] Axes { get; set; }
+    [JsonProperty("frequency")]
     public double Frequency { get; set; }
 
     public SliceDefinition(string name, Axis[] axes, double frequency)

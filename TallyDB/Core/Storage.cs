@@ -5,7 +5,7 @@ namespace TallyDB.Core
 {
   public static class Storage
   {
-    public static string RootDirectory = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), "TallyDB\\Source\\");
+    public static string RootDirectory = Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "TallyDB/Source/");
 
     static Storage()
     {
@@ -27,17 +27,23 @@ namespace TallyDB.Core
       Console.WriteLine("Created Directory: {0}", directory);
     }
 
+    public static void DeleteDirectory(string name)
+    {
+      var directory = Join(name);
+      Directory.Delete(directory, true);
+    }
+
     public static void CreateFile(string name)
     {
       var fs = File.Create(Join(name).AppendExtension());
       fs.Close();
     }
 
-    public static void GetDirectoriesInDirectory()
+    public static string[] GetDirectoriesInDirectory()
     {
-      Directory.GetDirectories(Join(""));
+      return Directory.GetDirectories(Join(""));
     }
-    
+
     public static string[] GetFilesInDirectory(string name)
     {
       return Directory.GetFiles(Join(name));

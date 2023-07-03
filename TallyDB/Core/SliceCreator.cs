@@ -16,7 +16,7 @@
     public Slice Create(SliceDefinition definition)
     {
       // Create file for slice
-      var filename = Storage.Join(string.Format("{0}\\{1}", _database.Name, definition.Name));
+      var filename = Storage.Join(string.Format("{0}/{1}", _database.Name, definition.Name));
       if (!File.Exists(filename))
       {
         Storage.CreateFile(filename);

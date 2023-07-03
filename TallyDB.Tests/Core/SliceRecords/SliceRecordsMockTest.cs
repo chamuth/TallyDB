@@ -7,7 +7,7 @@ namespace TallyDB.Tests.Core.SliceRecords
   public class SliceRecordsMockTest
   {
     string sliceName = "mock1";
-    string filename = Storage.Join("mock\\mock1");
+    string filename = Storage.Join("mock/mock1.tally");
 
     [TestInitialize]
     public void Prepare()
@@ -17,6 +17,12 @@ namespace TallyDB.Tests.Core.SliceRecords
       {
         File.Delete(filename);
       }
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+      Directory.Delete(Storage.Join("mock"), true);
     }
 
     [TestMethod("Should create slice")]
@@ -69,6 +75,66 @@ namespace TallyDB.Tests.Core.SliceRecords
       SliceDefinition def;
       SliceRecord[] records;
       mocker.Create(sliceName, out def, out records);
+
+      var storage = new SliceStorage(filename);
+      storage.LoadSliceDefinition();
+
+      var first = records.First().Time;
+      var last = records.Last().Time;
+
+      Assert.AreEqual(first, storage.First()?.Time);
+      Assert.AreEqual(last, storage.Last()?.Time);
+
+      storage.Dispose();
+    }
+
+    [TestMethod("Should have large datasets (10 thousand records)")]
+    public void ShouldHandleLargeDatasets()
+    {
+      var mocker = new MockSliceCreator(28);
+      SliceDefinition def;
+      SliceRecord[] records;
+      mocker.Create(sliceName, out def, out records, 10000);
+
+      var storage = new SliceStorage(filename);
+      storage.LoadSliceDefinition();
+
+      var first = records.First().Time;
+      var last = records.Last().Time;
+
+      Assert.AreEqual(first, storage.First()?.Time);
+      Assert.AreEqual(last, storage.Last()?.Time);
+
+      storage.Dispose();
+    }
+
+    [TestMethod("Should have very large datasets (100 thousand records)")]
+    public void ShouldHandleVeryLargeDatasets()
+    {
+      var mocker = new MockSliceCreator(28);
+      SliceDefinition def;
+      SliceRecord[] records;
+      mocker.Create(sliceName, out def, out records, 100000);
+
+      var storage = new SliceStorage(filename);
+      storage.LoadSliceDefinition();
+
+      var first = records.First().Time;
+      var last = records.Last().Time;
+
+      Assert.AreEqual(first, storage.First()?.Time);
+      Assert.AreEqual(last, storage.Last()?.Time);
+
+      storage.Dispose();
+    }
+
+    [TestMethod("Should have ultra large datasets (1 million records)")]
+    public void ShouldHandleUltraLargeDatasets()
+    {
+      var mocker = new MockSliceCreator(28);
+      SliceDefinition def;
+      SliceRecord[] records;
+      mocker.Create(sliceName, out def, out records, 1000000);
 
       var storage = new SliceStorage(filename);
       storage.LoadSliceDefinition();
