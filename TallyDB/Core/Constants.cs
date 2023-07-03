@@ -1,4 +1,4 @@
-﻿using static System.Environment;
+using static System.Environment;
 
 namespace TallyDB.Core
 {
@@ -14,5 +14,6 @@ namespace TallyDB.Core
 #else
     public static string TallyRoot = Path.Join(GetFolderPath(SpecialFolder.ApplicationData), "TallyDB/");
 #endif
+    public static TimeSpan ConnectionTimeout = TimeSpan.FromMinutes(1);
   }
 }
