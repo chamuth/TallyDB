@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using TallyDB.Config;
 using TallyDB.Config.Auth;
+using TallyDB.Core;
 using TallyDB.Server.QueryProcessor;
 using TallyDB.Server.Types;
 
@@ -20,6 +21,7 @@ namespace TallyDB.Server
       User? authUser = null;
       var authStorage = new AuthStorage(new FileOperator());
       var requestProcessor = new RequestProcessor();
+      var connectionTimeout = DateTime.Now.Add(Constants.ConnectionTimeout);
 
       while (true)
       {
@@ -41,6 +43,15 @@ namespace TallyDB.Server
         {
           value += (Convert.ToChar(data[i]));
         }
+
+        #region Connection Keep Alive
+        // reset connection timeout
+        if (connectionTimeout < DateTime.Now)
+        {
+          break;
+        }
+        connectionTimeout = DateTime.Now.Add(Constants.ConnectionTimeout);
+        #endregion
 
         var request = JsonConvert.DeserializeObject<QueryRequest>(value);
 
