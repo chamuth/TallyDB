@@ -17,30 +17,20 @@ namespace TallyDB.Server
 
     public void StartServer()
     {
-      TcpListener listener = new TcpListener(localAddr, port);
+      DatabaseManager.LoadDatabases();
+
+      IPEndPoint ep = new IPEndPoint(IPAddress.Any, port);
+      TcpListener listener = new TcpListener(ep);
       listener.Start();
+
+      Console.WriteLine("Started TallyDB server at {0} 🚀", port);
 
       while (true)
       {
+        Console.WriteLine("Waiting for socket connection");
         Socket client = listener.AcceptSocket();
-
-        var childSocketThread = new Thread(() =>
-        {
-          byte[] data = new byte[100];
-          int size = client.Receive(data);
-          Console.WriteLine("Recieved data: ");
-
-          for (int i = 0; i < size; i++)
-          {
-            Console.Write(Convert.ToChar(data[i]));
-          }
-
-          Console.WriteLine();
-
-          client.Close();
-        });
-
-        childSocketThread.Start();
+        Console.WriteLine("ACCEPTED SOCKET CONNECTION");
+        Task.Run(() => new ClientHandler().Handle(client));
       }
     }
   }
