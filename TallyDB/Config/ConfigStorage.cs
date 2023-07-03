@@ -1,12 +1,12 @@
-﻿using static System.Environment;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using TallyDB.Core;
 
 namespace TallyDB.Config
 {
   public abstract class ConfigStorage<T>
   {
     public abstract string Path { get; set; }
-    public static string RootDirectory = System.IO.Path.Combine(GetFolderPath(SpecialFolder.ApplicationData), "TallyDB/Config/");
+    public static string RootDirectory = System.IO.Path.Combine(Constants.TallyRoot, "Config/");
 
     private IFileOperable file;
 
