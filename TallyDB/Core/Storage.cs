@@ -6,7 +6,6 @@
 
     static Storage()
     {
-      Console.WriteLine(RootDirectory);
       if (!Directory.Exists(RootDirectory))
       {
         Directory.CreateDirectory(RootDirectory);
